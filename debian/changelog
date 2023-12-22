@@ -1,3 +1,9 @@
+gcc-13 (13.2.0-3deepin1) unstable; urgency=medium
+
+  * feat: use gcc-13 to build gcc-13
+
+ -- Chang Yang <yangchang@deepin.org>  Thu, 07 Mar 2024 10:58:05 +0800
+
 gcc-13 (13.2.0-3deepin) unstable; urgency=medium
 
   * Add pie support on Deepin and Uos.
