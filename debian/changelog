@@ -1,3 +1,9 @@
+gcc-13 (13.2.0-3deepin2) unstable; urgency=medium
+
+  * add lsx support
+
+ -- Chang Yang <yangchang@deepin.org>  Wed, 10 Apr 2024 11:42:36 +0800
+
 gcc-13 (13.2.0-3deepin1) unstable; urgency=medium
 
   * feat: use gcc-13 to build gcc-13
