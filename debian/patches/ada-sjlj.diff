@@ -1,6 +1,11 @@
-# Please read ada-changes-in-autogen-output.diff about src/Makefile.def.
-
-# !!! Must be applied after ada-libgnat_util.diff
+Autogen should refresh src/Makefile.in from src/Makefile.{def,tpl}
+at build time, but we do not want to Build-Depend: guile.
+# export QUILT_PATCHES=debian/patches
+# quilt pop $this.diff
+# quilt add src/Makefile.in
+# (cd src && autogen Makefile.def)
+# quilt refresh --no-timestamps --no-index -pab
+# quilt push -a
 
 --- /dev/null
 +++ b/src/libada-sjlj/Makefile.in

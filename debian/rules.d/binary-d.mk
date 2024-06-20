@@ -2,7 +2,11 @@ ifneq ($(DEB_STAGE),rtlibs)
   ifneq (,$(filter yes, $(biarch64) $(biarch32) $(biarchn32) $(biarchx32) $(biarchsf)))
     arch_binaries  := $(arch_binaries) gdc-multi
   endif
-  arch_binaries := $(arch_binaries) gdc
+  arch_binaries := $(arch_binaries) gdc-nat gdc-host
+  ifeq ($(unprefixed_names),yes)
+    arch_binaries := $(arch_binaries) gdc
+    indep_binaries := $(indep_binaries) gdc-build
+  endif
 
   ifeq ($(with_libphobosdev),yes)
     $(lib_binaries) += libphobos-dev
@@ -50,11 +54,17 @@ ifneq ($(DEB_STAGE),rtlibs)
   endif
 endif
 
-p_gdc           = gdc$(pkg_ver)$(cross_bin_arch)
+p_gdc_n		= gdc$(pkg_ver)-$(subst _,-,$(TARGET_ALIAS))
+p_gdc_h		= gdc$(pkg_ver)-for-host
+p_gdc_b		= gdc$(pkg_ver)-for-build
+p_gdc           = gdc$(pkg_ver)
 p_gdc_m		= gdc$(pkg_ver)-multilib$(cross_bin_arch)
 p_libphobos     = libgphobos$(GPHOBOS_SONAME)
 p_libphobosdev  = libgphobos$(pkg_ver)-dev
 
+d_gdc_n		= debian/$(p_gdc_n)
+d_gdc_h		= debian/$(p_gdc_h)
+d_gdc_b		= debian/$(p_gdc_b)
 d_gdc           = debian/$(p_gdc)
 d_gdc_m		= debian/$(p_gdc_m)
 d_libphobos     = debian/$(p_libphobos)
@@ -68,21 +78,27 @@ endif
 # FIXME: always here?
 gdc_include_dir := $(gcc_lib_dir)/include/d
 
-dirs_gdc = \
+dirs_gdc_n = \
 	$(PF)/bin \
 	$(PF)/share/man/man1 \
 	$(gcc_lib_dir) \
-	$(gcc_lexec_dir)
+	$(gcc_lexec_dir) \
+	usr/share/lintian/overrides
+
+dirs_gdc = \
+	$(PF)/bin \
+	$(PF)/share/man/man1
+
 ifneq ($(DEB_CROSS),yes)
-  dirs_gdc += \
+  dirs_gdc_n += \
 	$(gdc_include_dir)
 endif
 
-files_gdc = \
+files_gdc_n = \
 	$(PF)/bin/$(cmd_prefix)gdc$(pkg_ver) \
 	$(gcc_lexec_dir)/d21
 ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
-    files_gdc += \
+    files_gdc_n += \
 	$(PF)/share/man/man1/$(cmd_prefix)gdc$(pkg_ver).1
 endif
 
@@ -90,6 +106,68 @@ dirs_libphobos = \
 	$(PF)/lib \
 	$(gdc_include_dir) \
 	$(gcc_lib_dir)
+
+$(binary_stamp)-gdc-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+
+	rm -rf $(d_gdc_n)
+	dh_installdirs -p$(p_gdc_n) $(dirs_gdc_n)
+
+	debian/dh_doclink -p$(p_gdc_n) $(p_xbase)
+
+	$(dh_compat2) dh_movefiles -p$(p_gdc_n) -X/zlib/ $(files_gdc_n)
+
+ifeq ($(with_phobos),yes)
+	mv $(d)/$(usr_lib)/libgphobos.spec $(d_gdc_n)/$(gcc_lib_dir)/
+endif
+
+# FIXME: __entrypoint.di needs to go into a libgdc-dev Multi-Arch: same package
+##	# Always needed by gdc.
+##	mkdir -p $(d_gdc_n)/$(gdc_include_dir)
+##	cp $(srcdir)/libphobos/libdruntime/__entrypoint.di \
+##	    $(d_gdc_n)/$(gdc_include_dir)/.
+#ifneq ($(DEB_CROSS),yes)
+#	dh_link -p$(p_gdc_n) \
+#		/$(gdc_include_dir) \
+#		/$(dir $(gdc_include_dir))/$(GCC_VERSION)
+#endif
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_gdc_n)/$(gcc_lexec_dir)/d21
+endif
+	dh_strip -p$(p_gdc_n) \
+	  $(if $(unstripped_exe),-X/d21)
+	dh_shlibdeps -p$(p_gdc_n)
+
+	echo '$(p_gdc_n) binary: hardening-no-pie' \
+	  > $(d_gdc_n)/usr/share/lintian/overrides/$(p_gdc_n)
+
+	echo $(p_gdc_n) >> debian/arch_binaries
+
+	find $(d_gdc_n) -type d -empty -delete
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gdc-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gdc_h)
+	debian/dh_doclink -p$(p_gdc_h) $(p_xbase)
+	echo $(p_gdc_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gdc-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gdc_b)
+	debian/dh_doclink -p$(p_gdc_b) $(p_cpp_b)
+	echo $(p_gdc_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
 
 $(binary_stamp)-gdc: $(install_stamp)
 	dh_testdir
@@ -102,47 +180,16 @@ $(binary_stamp)-gdc: $(install_stamp)
 	dh_installdocs -p$(p_gdc)
 	dh_installchangelogs -p$(p_gdc) src/gcc/d/ChangeLog
 
-	$(dh_compat2) dh_movefiles -p$(p_gdc) -X/zlib/ $(files_gdc)
-
-ifeq ($(with_phobos),yes)
-	mv $(d)/$(usr_lib)/libgphobos.spec $(d_gdc)/$(gcc_lib_dir)/
-endif
-
-ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gdc$(pkg_ver) \
 	    $(d_gdc)/$(PF)/bin/gdc$(pkg_ver)
-  ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
-	ln -sf $(cmd_prefix)gdc$(pkg_ver).1 \
-	    $(d_gdc)/$(PF)/share/man/man1/gdc$(pkg_ver).1
-  endif
+ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
+	ln -sf $(cmd_prefix)gdc$(pkg_ver).1.gz \
+	    $(d_gdc)/$(PF)/share/man/man1/gdc$(pkg_ver).1.gz
 endif
-
-# FIXME: __entrypoint.di needs to go into a libgdc-dev Multi-Arch: same package
-##	# Always needed by gdc.
-##	mkdir -p $(d_gdc)/$(gdc_include_dir)
-##	cp $(srcdir)/libphobos/libdruntime/__entrypoint.di \
-##	    $(d_gdc)/$(gdc_include_dir)/.
-#ifneq ($(DEB_CROSS),yes)
-#	dh_link -p$(p_gdc) \
-#		/$(gdc_include_dir) \
-#		/$(dir $(gdc_include_dir))/$(GCC_VERSION)
-#endif
 
 	dh_link -p$(p_gdc) \
 		/$(docdir)/$(p_xbase)/README.Bugs \
 		/$(docdir)/$(p_gdc)/README.Bugs
-
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_gdc)/$(gcc_lexec_dir)/d21
-endif
-	dh_strip -p$(p_gdc) \
-	  $(if $(unstripped_exe),-X/d21)
-	dh_shlibdeps -p$(p_gdc)
-
-	mkdir -p $(d_gdc)/usr/share/lintian/overrides
-	echo '$(p_gdc) binary: hardening-no-pie' \
-	  > $(d_gdc)/usr/share/lintian/overrides/$(p_gdc)
 
 	echo $(p_gdc) >> debian/arch_binaries
 

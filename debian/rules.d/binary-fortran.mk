@@ -45,7 +45,11 @@ ifeq ($(with_fdev),yes)
   ifneq (,$(filter yes, $(biarch64) $(biarch32) $(biarchn32) $(biarchx32) $(biarchhf) $(biarchsf)))
     arch_binaries  := $(arch_binaries) fdev-multi
   endif
-  arch_binaries  := $(arch_binaries) fdev
+  arch_binaries  := $(arch_binaries) fdev-nat fdev-host
+  ifeq ($(unprefixed_names),yes)
+    arch_binaries  := $(arch_binaries) fdev
+    indep_binaries := $(indep_binaries) fdev-build
+  endif
   ifneq ($(DEB_CROSS),yes)
     ifneq ($(GFDL_INVARIANT_FREE),yes)
       indep_binaries := $(indep_binaries) fortran-doc
@@ -53,29 +57,41 @@ ifeq ($(with_fdev),yes)
   endif
 endif
 
-p_g95	= gfortran$(pkg_ver)$(cross_bin_arch)
+p_g95_n = gfortran$(pkg_ver)-$(subst _,-,$(TARGET_ALIAS))
+p_g95_h = gfortran$(pkg_ver)-for-host
+p_g95_b = gfortran$(pkg_ver)-for-build
+p_g95	= gfortran$(pkg_ver)
 p_g95_m	= gfortran$(pkg_ver)-multilib$(cross_bin_arch)
 p_g95d	= gfortran$(pkg_ver)-doc
 p_flib	= libgfortran$(FORTRAN_SONAME)$(cross_lib_arch)
 
+d_g95_n = debian/$(p_g95_n)
+d_g95_h = debian/$(p_g95_h)
+d_g95_b = debian/$(p_g95_b)
 d_g95	= debian/$(p_g95)
 d_g95_m	= debian/$(p_g95_m)
 d_g95d	= debian/$(p_g95d)
 
-dirs_g95 = \
-	$(docdir)/$(p_xbase)/fortran \
+dirs_g95_n = \
 	$(PF)/bin \
 	$(gcc_lexec_dir) \
 	$(gcc_lib_dir) \
 	$(PF)/include \
+	$(PF)/share/man/man1 \
+	usr/share/lintian/overrides
+
+dirs_g95 = \
+	$(docdir)/$(p_xbase)/fortran \
+	$(PF)/bin \
 	$(PF)/share/man/man1
-files_g95 = \
+
+files_g95_n = \
 	$(PF)/bin/$(cmd_prefix)gfortran$(pkg_ver) \
 	$(gcc_lib_dir)/finclude \
 	$(gcc_lexec_dir)/f951 
 
 ifneq ($(GFDL_INVARIANT_FREE),yes)
-  files_g95 += \
+  files_g95_n += \
 	$(PF)/share/man/man1/$(cmd_prefix)gfortran$(pkg_ver).1
 endif
 
@@ -168,6 +184,62 @@ $(binary_stamp)-libsffortran: $(install_stamp)
 	$(call do_fortran,sf)
 
 # ----------------------------------------------------------------------
+$(binary_stamp)-fdev-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+
+	rm -rf $(d_g95_n)
+	dh_installdirs -p$(p_g95_n) $(dirs_g95_n)
+
+	$(dh_compat2) dh_movefiles -p$(p_g95_n) $(files_g95_n)
+
+	mv $(d)/$(usr_lib)/libgfortran.spec $(d_g95_n)/$(gcc_lib_dir)/
+
+	( \
+	  echo '$(p_g95_n) binary: hardening-no-pie'; \
+	  echo '$(p_g95_n) binary: missing-prerequisite-for-gfortran-module'; \
+	) \
+	  > $(d_g95_n)/usr/share/lintian/overrides/$(p_g95_n)
+ifeq ($(GFDL_INVARIANT_FREE),yes)
+	echo '$(p_g95_n) binary: binary-without-manpage' \
+	  >> $(d_g95_n)/usr/share/lintian/overrides/$(p_g95_n)
+endif
+
+	debian/dh_doclink -p$(p_g95_n) $(p_xbase)
+
+	debian/dh_rmemptydirs -p$(p_g95_n)
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_g95_n)/$(gcc_lexec_dir)/f951
+endif
+	dh_strip -p$(p_g95_n) \
+	  $(if $(unstripped_exe),-X/f951)
+	dh_shlibdeps -p$(p_g95_n)
+
+	echo $(p_g95_n) >> debian/arch_binaries
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-fdev-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_g95_h)
+	debian/dh_doclink -p$(p_g95_h) $(p_xbase)
+	echo $(p_g95_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-fdev-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_g95_b)
+	debian/dh_doclink -p$(p_g95_b) $(p_cpp_b)
+	echo $(p_g95_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
 $(binary_stamp)-fdev: $(install_stamp)
 	dh_testdir
 	dh_testroot
@@ -176,27 +248,17 @@ $(binary_stamp)-fdev: $(install_stamp)
 	rm -rf $(d_g95)
 	dh_installdirs -p$(p_g95) $(dirs_g95)
 
-	$(dh_compat2) dh_movefiles -p$(p_g95) $(files_g95)
-
-	mv $(d)/$(usr_lib)/libgfortran.spec $(d_g95)/$(gcc_lib_dir)/
-
-ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gfortran$(pkg_ver) \
 	    $(d_g95)/$(PF)/bin/gfortran$(pkg_ver)
-  ifneq ($(GFDL_INVARIANT_FREE),yes)
+ifneq ($(GFDL_INVARIANT_FREE),yes)
 	ln -sf $(cmd_prefix)gfortran$(pkg_ver).1 \
 	    $(d_g95)/$(PF)/share/man/man1/gfortran$(pkg_ver).1
-  endif
 endif
 
-	mkdir -p $(d_g95)/usr/share/lintian/overrides
-	( \
-	  echo '$(p_g95) binary: hardening-no-pie'; \
-	  echo '$(p_g95) binary: missing-prerequisite-for-gfortran-module'; \
-	) > $(d_g95)/usr/share/lintian/overrides/$(p_g95)
 ifeq ($(GFDL_INVARIANT_FREE),yes)
+	mkdir -p $(d_g95)/usr/share/lintian/overrides
 	echo '$(p_g95) binary: binary-without-manpage' \
-	  >> $(d_g95)/usr/share/lintian/overrides/$(p_g95)
+	  > $(d_g95)/usr/share/lintian/overrides/$(p_g95)
 endif
 
 	debian/dh_doclink -p$(p_g95) $(p_xbase)
@@ -205,13 +267,6 @@ endif
 		$(d_g95)/$(docdir)/$(p_xbase)/fortran/changelog
 	debian/dh_rmemptydirs -p$(p_g95)
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_g95)/$(gcc_lexec_dir)/f951
-endif
-	dh_strip -p$(p_g95) \
-	  $(if $(unstripped_exe),-X/f951)
-	dh_shlibdeps -p$(p_g95)
 	echo $(p_g95) >> debian/arch_binaries
 
 	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)

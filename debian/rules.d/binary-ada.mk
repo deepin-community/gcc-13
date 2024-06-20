@@ -9,7 +9,11 @@ ifeq ($(with_libgnat),yes)
   $(lib_binaries) += libgnat
 endif
 
-arch_binaries := $(arch_binaries) ada
+arch_binaries := $(arch_binaries) ada-nat ada-host
+ifeq ($(unprefixed_names),yes)
+  arch_binaries := $(arch_binaries) ada
+  indep_binaries := $(indep_binaries) ada-build
+endif
 ifneq ($(DEB_CROSS),yes)
   ifneq ($(GFDL_INVARIANT_FREE),yes)
     indep_binaries := $(indep_binaries) ada-doc
@@ -23,13 +27,19 @@ ifeq ($(with_separate_gnat),yes)
   p_glbase	= gnat$(pkg_ver)$(cross_bin_arch)-base
 endif
 
-p_gnat	= gnat-$(GNAT_VERSION)$(cross_bin_arch)
+p_gnat_n = gnat-$(GNAT_VERSION)-$(subst _,-,$(TARGET_ALIAS))
+p_gnat_h = gnat-$(GNAT_VERSION)-for-host
+p_gnat_b = gnat-$(GNAT_VERSION)-for-build
+p_gnat	= gnat-$(GNAT_VERSION)
 p_gnatsjlj= gnat-$(GNAT_VERSION)-sjlj$(cross_bin_arch)
 p_lgnat	= libgnat-$(GNAT_VERSION)$(cross_lib_arch)
 p_lgnat_dbg = libgnat-$(GNAT_VERSION)-dbg$(cross_lib_arch)
 p_gnatd	= $(p_gnat)-doc
 
 d_gbase	= debian/$(p_gbase)
+d_gnat_n = debian/$(p_gnat_n)
+d_gnat_h = debian/$(p_gnat_h)
+d_gnat_b = debian/$(p_gnat_b)
 d_gnat	= debian/$(p_gnat)
 d_gnatsjlj	= debian/$(p_gnatsjlj)
 d_lgnat	= debian/$(p_lgnat)
@@ -38,14 +48,21 @@ d_gnatd	= debian/$(p_gnatd)
 GNAT_TOOLS = gnat gnatbind gnatchop gnatclean gnatkr gnatlink \
 	     gnatls gnatmake gnatname gnatprep gnathtml
 
-dirs_gnat = \
+dirs_gnat_n = \
 	$(docdir)/$(p_gbase) \
 	$(PF)/bin \
 	$(PF)/share/man/man1 \
 	$(gcc_lib_dir)/{adalib,adainclude} \
-	$(gcc_lexec_dir)
+	$(gcc_lexec_dir) \
+	usr/share/lintian/overrides
 
-files_gnat = \
+dirs_gnat = \
+	$(docdir)/$(p_gbase)/ada \
+	$(PF)/bin \
+	$(PF)/share/man/man1 \
+	usr/share/lintian/overrides
+
+files_gnat_n = \
 	$(gcc_lexec_dir)/gnat1 \
 	$(gcc_lib_dir)/ada_target_properties \
 	$(gcc_lib_dir)/adainclude/*.ad[bs] \
@@ -129,6 +146,85 @@ endif
 
 	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
 
+$(binary_stamp)-ada-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	: # $(p_gnat_n)
+	rm -rf $(d_gnat_n)
+	dh_installdirs -p$(p_gnat_n) $(dirs_gnat_n)
+	: # Upstream does not install gnathtml.
+	cp src/gcc/ada/gnathtml.pl debian/tmp/$(PF)/bin/$(cmd_prefix)gnathtml$(pkg_ver)
+	chmod 755 debian/tmp/$(PF)/bin/$(cmd_prefix)gnathtml$(pkg_ver)
+	$(dh_compat2) dh_movefiles -p$(p_gnat_n) $(files_gnat_n)
+
+ifeq ($(with_libgnat),yes)
+  # Development links to actual shared libraries provided by libgnat.
+	dh_install -p$(p_gnat_n) $(gcc_lib_dir)/adalib/libgna{t,rl}.so $(usr_lib)
+  # Similar links specific to Debian. FIXME: what is their purpose?
+	dh_link -p$(p_gnat_n) $(foreach lib,libgnat libgnarl,\
+	  $(usr_lib)/$(lib)-$(GNAT_SONAME).so $(gcc_lib_dir)/adalib/$(lib).so)
+endif
+	debian/dh_doclink -p$(p_gnat_n)      $(p_gbase)
+	for i in $(GNAT_TOOLS); do \
+	  case "$$i" in \
+	    gnat) cp -p debian/gnat.1 $(d_gnat_n)/$(PF)/share/man/man1/$(cmd_prefix)gnat$(pkg_ver).1 ;; \
+	    *) ln -sf $(cmd_prefix)gnat$(pkg_ver).1 $(d_gnat_n)/$(PF)/share/man/man1/$(cmd_prefix)$$i$(pkg_ver).1; \
+	  esac; \
+	done
+
+	: # still ship the unversioned prefixed names in the gnat package.
+	for i in $(GNAT_TOOLS); do \
+	  ln -sf $(cmd_prefix)$$i$(pkg_ver) \
+	    $(d_gnat_n)/$(PF)/bin/$(cmd_prefix)$$i; \
+	  ln -sf $(cmd_prefix)gnat$(pkg_ver).1.gz \
+	    $(d_gnat_n)/$(PF)/share/man/man1/$(cmd_prefix)$$i.1.gz; \
+	done
+
+	: # keep this one unversioned, see Debian #802838.
+	install -m755 debian/ada/gnatgcc $(d_gnat_n)/usr/bin/$(cmd_prefix)gnatgcc
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_gnat_n)/$(gcc_lexec_dir)/gnat1
+endif
+	dh_strip -p$(p_gnat_n)
+	find $(d_gnat_n) -name '*.ali' | xargs $(sed_ali_strip_prefix_map)
+	find $(d_gnat_n) -name '*.ali' | xargs chmod 444
+	dh_shlibdeps -p$(p_gnat_n)
+	( \
+	  echo '$(p_gnat_n) binary: hardening-no-pie'; \
+	  echo '$(p_gnat_n) binary: non-standard-file-perm' \
+	) > $(d_gnat_n)/usr/share/lintian/overrides/$(p_gnat_n)
+ifeq ($(GFDL_INVARIANT_FREE),yes)
+	echo '$(p_gnat_n) binary: binary-without-manpage' \
+	  >> $(d_gnat_n)/usr/share/lintian/overrides/$(p_gnat_n)
+endif
+
+	debian/dh_rmemptydirs -p$(p_gnat_n)
+
+	echo $(p_gnat_n) >> debian/arch_binaries
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-ada-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gnat_h)
+	debian/dh_doclink -p$(p_gnat_h) $(p_xbase)
+	echo $(p_gnat_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-ada-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gnat_b)
+	debian/dh_doclink -p$(p_gnat_b) $(p_cpp_b)
+	echo $(p_gnat_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
 $(binary_stamp)-ada: $(install_stamp)
 	dh_testdir
 	dh_testroot
@@ -136,23 +232,12 @@ $(binary_stamp)-ada: $(install_stamp)
 	: # $(p_gnat)
 	rm -rf $(d_gnat)
 	dh_installdirs -p$(p_gnat) $(dirs_gnat)
-	: # Upstream does not install gnathtml.
-	cp src/gcc/ada/gnathtml.pl debian/tmp/$(PF)/bin/$(cmd_prefix)gnathtml$(pkg_ver)
-	chmod 755 debian/tmp/$(PF)/bin/$(cmd_prefix)gnathtml$(pkg_ver)
-	$(dh_compat2) dh_movefiles -p$(p_gnat) $(files_gnat)
 
 ifeq ($(with_gnatsjlj),yes)
 	dh_installdirs -p$(p_gnatsjlj) $(gcc_lib_dir)
 	$(dh_compat2) dh_movefiles -p$(p_gnatsjlj) $(gcc_lib_dir)/rts-sjlj/adalib $(gcc_lib_dir)/rts-sjlj/adainclude
 endif
 
-ifeq ($(with_libgnat),yes)
-  # Development links to actual shared libraries provided by libgnat.
-	dh_install -p$(p_gnat) $(gcc_lib_dir)/adalib/libgna{t,rl}.so $(usr_lib)
-  # Similar links specific to Debian. FIXME: what is their purpose?
-	dh_link -p$(p_gnat) $(foreach lib,libgnat libgnarl,\
-	  $(usr_lib)/$(lib)-$(GNAT_SONAME).so $(gcc_lib_dir)/adalib/$(lib).so)
-endif
 	debian/dh_doclink -p$(p_gnat)      $(p_gbase)
 ifeq ($(with_gnatsjlj),yes)
 	debian/dh_doclink -p$(p_gnatsjlj) $(p_gbase)
@@ -162,26 +247,10 @@ ifeq ($(PKGSOURCE),gnat-$(BASE_VERSION))
 	cp -p test-summary $(d_gnat)/$(docdir)/$(p_gbase)/.
   endif
 else
-	mkdir -p $(d_gnat)/$(docdir)/$(p_gbase)/ada
 	cp -p src/gcc/ada/ChangeLog $(d_gnat)/$(docdir)/$(p_gbase)/ada/.
 endif
 
-	for i in $(GNAT_TOOLS); do \
-	  case "$$i" in \
-	    gnat) cp -p debian/gnat.1 $(d_gnat)/$(PF)/share/man/man1/$(cmd_prefix)gnat$(pkg_ver).1 ;; \
-	    *) ln -sf $(cmd_prefix)gnat$(pkg_ver).1 $(d_gnat)/$(PF)/share/man/man1/$(cmd_prefix)$$i$(pkg_ver).1; \
-	  esac; \
-	done
-
 ifneq (,$(filter $(build_type), build-native cross-build-native))
-	: # still ship the unversioned prefixed names in the gnat package.
-	for i in $(GNAT_TOOLS); do \
-	  ln -sf $(cmd_prefix)$$i$(pkg_ver) \
-	    $(d_gnat)/$(PF)/bin/$(cmd_prefix)$$i; \
-	  ln -sf $(cmd_prefix)gnat$(pkg_ver).1.gz \
-	    $(d_gnat)/$(PF)/share/man/man1/$(cmd_prefix)$$i.1.gz; \
-	done
-  ifeq ($(unprefixed_names),yes)
 	: # ship the versioned prefixed names in the gnat package.
 	for i in $(GNAT_TOOLS); do \
 	  ln -sf $(cmd_prefix)$$i$(pkg_ver) \
@@ -198,19 +267,8 @@ ifneq (,$(filter $(build_type), build-native cross-build-native))
 	    $(d_gnat)/$(PF)/share/man/man1/$$i.1.gz; \
 	done
 
-  endif
-else
-	: # still ship the unversioned prefixed names in the gnat package.
-	for i in $(GNAT_TOOLS); do \
-	  ln -sf $(cmd_prefix)$$i$(pkg_ver) \
-	    $(d_gnat)/$(PF)/bin/$(cmd_prefix)$$i; \
-	  ln -sf $(cmd_prefix)gnat$(pkg_ver).1.gz \
-	    $(d_gnat)/$(PF)/share/man/man1/$(cmd_prefix)$$i.1.gz; \
-	done
 endif
 
-	: # keep this one unversioned, see Debian #802838.
-	install -m755 debian/ada/gnatgcc $(d_gnat)/usr/bin/$(cmd_prefix)gnatgcc
 ifneq ($(GFDL_INVARIANT_FREE),yes)
 	dh_link -p$(p_gnat) \
 		usr/share/man/man1/$(cmd_prefix)gcc$(pkg_ver).1.gz \
@@ -225,25 +283,13 @@ ifeq ($(unprefixed_names),yes)
 		usr/share/man/man1/gnatgcc.1.gz
   endif
 endif
-	debian/dh_rmemptydirs -p$(p_gnat)
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_gnat)/$(gcc_lexec_dir)/gnat1
-endif
-	dh_strip -p$(p_gnat)
-	find $(d_gnat) -name '*.ali' | xargs $(sed_ali_strip_prefix_map)
-	find $(d_gnat) -name '*.ali' | xargs chmod 444
-	dh_shlibdeps -p$(p_gnat)
-	mkdir -p $(d_gnat)/usr/share/lintian/overrides
-	( \
-	  echo '$(p_gnat) binary: hardening-no-pie'; \
-	  echo '$(p_gnat) binary: non-standard-file-perm' \
-	) > $(d_gnat)/usr/share/lintian/overrides/$(p_gnat)
 ifeq ($(GFDL_INVARIANT_FREE),yes)
 	echo '$(p_gnat) binary: binary-without-manpage' \
 	  >> $(d_gnat)/usr/share/lintian/overrides/$(p_gnat)
 endif
+
+	debian/dh_rmemptydirs -p$(p_gnat)
 
 	echo $(p_gnat) >> debian/arch_binaries
 

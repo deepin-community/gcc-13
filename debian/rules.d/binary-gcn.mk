@@ -14,10 +14,12 @@ d_pl_gcn = debian/$(p_pl_gcn)
 dirs_gcn = \
 	$(docdir)/$(p_xbase)/ \
 	$(PF)/bin \
+	$(gcc_lib_dir)/accel \
 	$(gcc_lexec_dir)/accel
 
 files_gcn = \
 	$(PF)/bin/$(DEB_TARGET_GNU_TYPE)-accel-$(gcn_target_name)-gcc$(pkg_ver) \
+	$(gcc_lib_dir)/accel/$(gcn_target_name) \
 	$(gcc_lexec_dir)/accel/$(gcn_target_name)
 
 # not needed: libs moved, headers not needed for lto1

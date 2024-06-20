@@ -252,3 +252,34 @@
    %{shared:-shared} \
    %{!shared: \
      %{!static: \
+--- a/src/gcc/config/loongarch/gnu-user.h
++++ b/src/gcc/config/loongarch/gnu-user.h
+@@ -45,6 +45,7 @@ along with GCC; see the file COPYING3.
+ #undef GNU_USER_TARGET_LINK_SPEC
+ #define GNU_USER_TARGET_LINK_SPEC \
+   "%{G*} %{shared} -m " GNU_USER_LINK_EMULATION \
++  " %{!fsanitize=*:--as-needed} " \
+   "%{!shared: %{static} " \
+   "%{!static: %{!static-pie: %{rdynamic:-export-dynamic} " \
+   "-dynamic-linker " GNU_USER_DYNAMIC_LINKER "}} " \
+--- a/src/gcc/config/sparc/linux64.h
++++ b/src/gcc/config/sparc/linux64.h
+@@ -90,7 +90,7 @@ along with GCC; see the file COPYING3.  If not see
+   { "link_arch_default", LINK_ARCH_DEFAULT_SPEC },	  \
+   { "link_arch",	 LINK_ARCH_SPEC },
+ 
+-#define LINK_ARCH32_SPEC "-m elf32_sparc %{shared:-shared} \
++#define LINK_ARCH32_SPEC "-m elf32_sparc %{shared:-shared} %{!fsanitize=*:--as-needed} \
+   %{!shared: \
+     %{!static: \
+       %{rdynamic:-export-dynamic} \
+@@ -98,7 +98,7 @@ along with GCC; see the file COPYING3.  If not see
+       %{static:-static}} \
+ "
+ 
+-#define LINK_ARCH64_SPEC "-m elf64_sparc %{shared:-shared} \
++#define LINK_ARCH64_SPEC "-m elf64_sparc %{shared:-shared} %{!fsanitize=*:--as-needed} \
+   %{!shared: \
+     %{!static: \
+       %{rdynamic:-export-dynamic} \
+

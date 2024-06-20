@@ -30,7 +30,11 @@ ifeq ($(with_libx32godev),yes)
 endif
 
 ifneq ($(DEB_STAGE),rtlibs)
-  arch_binaries  := $(arch_binaries) gccgo
+  arch_binaries  := $(arch_binaries) gccgo-nat gccgo-host
+  ifeq ($(unprefixed_names),yes)
+    arch_binaries  := $(arch_binaries) gccgo
+    indep_binaries := $(indep_binaries) gccgo-build
+  endif
   ifneq (,$(filter yes, $(biarch64) $(biarch32) $(biarchn32) $(biarchx32)))
     arch_binaries  := $(arch_binaries) gccgo-multi
   endif
@@ -41,29 +45,41 @@ ifneq ($(DEB_STAGE),rtlibs)
   endif
 endif
 
-p_go	= gccgo$(pkg_ver)$(cross_bin_arch)
+p_go_n  = gccgo$(pkg_ver)-$(subst _,-,$(TARGET_ALIAS))
+p_go_h  = gccgo$(pkg_ver)-for-host
+p_go_b  = gccgo$(pkg_ver)-for-build
+p_go	= gccgo$(pkg_ver)
 p_go_m	= gccgo$(pkg_ver)-multilib$(cross_bin_arch)
 p_god	= gccgo$(pkg_ver)-doc
 p_golib	= libgo$(GO_SONAME)$(cross_lib_arch)
 
+d_go_n  = debian/$(p_go_n)
+d_go_h  = debian/$(p_go_h)
+d_go_b  = debian/$(p_go_b)
 d_go	= debian/$(p_go)
 d_go_m	= debian/$(p_go_m)
 d_god	= debian/$(p_god)
 d_golib	= debian/$(p_golib)
 
-dirs_go = \
-	$(docdir)/$(p_xbase)/go \
+dirs_go_n = \
 	$(PF)/bin \
 	$(gcc_lexec_dir) \
 	$(gcc_lib_dir) \
 	$(PF)/include \
-	$(PF)/share/man/man1
-files_go = \
+	$(PF)/share/man/man1 \
+	usr/share/lintian/overrides
+
+dirs_go = \
+	$(docdir)/$(p_xbase)/go \
+	$(PF)/bin \
+	$(PF)/share/man/man1 \
+
+files_go_n = \
 	$(PF)/bin/$(cmd_prefix)gccgo$(pkg_ver) \
 	$(gcc_lexec_dir)/go1
 
 ifneq (,$(filter $(build_type), build-native cross-build-native))
-  files_go += \
+  files_go_n += \
 	$(PF)/bin/$(cmd_prefix){go,gofmt}$(pkg_ver) \
 	$(gcc_lexec_dir)/cgo \
 	$(gcc_lexec_dir)/{buildid,test2json,vet} \
@@ -71,18 +87,20 @@ ifneq (,$(filter $(build_type), build-native cross-build-native))
 endif
 
 ifneq ($(GFDL_INVARIANT_FREE),yes)
-  files_go += \
+  files_go_n += \
 	$(PF)/share/man/man1/$(cmd_prefix)gccgo$(pkg_ver).1
 endif
 
 ifeq ($(with_standalone_go),yes)
 
-  dirs_go += \
+  dirs_go_n += \
 	$(gcc_lib_dir)/include \
+	$(PF)/share/man/man1
+  dirs_go += \
 	$(PF)/share/man/man1
 
 # XXX: what about triarch mapping?
-  files_go += \
+  files_go_n += \
 	$(PF)/bin/$(cmd_prefix){cpp,gcc,gcov,gcov-tool}$(pkg_ver) \
 	$(PF)/bin/$(cmd_prefix)gcc-{ar,ranlib,nm}$(pkg_ver) \
 	$(PF)/share/man/man1/$(cmd_prefix)gcc-{ar,nm,ranlib}$(pkg_ver).1 \
@@ -94,26 +112,26 @@ ifeq ($(with_standalone_go),yes)
 		&& echo $(gcc_lib_dir)/SYSCALLS.c.X)
 
   ifeq ($(with_cc1),yes)
-    files_go += \
+    files_go_n += \
 	$(gcc_lib_dir)/plugin/libcc1plugin.so{,.0,.0.0.0}
   endif
 
   ifneq ($(GFDL_INVARIANT_FREE),yes)
-    files_go += \
+    files_go_n += \
 	$(PF)/share/man/man1/$(cmd_prefix){cpp,gcc,gcov,gcov-tool}$(pkg_ver).1
   endif
 
   ifeq ($(biarch64),yes)
-    files_go += $(gcc_lib_dir)/$(biarch64subdir)/{libgcc*,libgcov.a,*.o}
+    files_go_n += $(gcc_lib_dir)/$(biarch64subdir)/{libgcc*,libgcov.a,*.o}
   endif
   ifeq ($(biarch32),yes)
-    files_go += $(gcc_lib_dir)/$(biarch32subdir)/{libgcc*,*.o}
+    files_go_n += $(gcc_lib_dir)/$(biarch32subdir)/{libgcc*,*.o}
   endif
   ifeq ($(biarchn32),yes)
-    files_go += $(gcc_lib_dir)/$(biarchn32subdir)/{libgcc*,libgcov.a,*.o}
+    files_go_n += $(gcc_lib_dir)/$(biarchn32subdir)/{libgcc*,libgcov.a,*.o}
   endif
   ifeq ($(biarchx32),yes)
-    files_go += $(gcc_lib_dir)/$(biarchx32subdir)/{libgcc*,libgcov.a,*.o}
+    files_go_n += $(gcc_lib_dir)/$(biarchx32subdir)/{libgcc*,libgcov.a,*.o}
   endif
 endif
 
@@ -242,6 +260,74 @@ $(binary_stamp)-libn32go-dev: $(install_stamp)
 	$(call do_libgo_dev,n32)
 
 # ----------------------------------------------------------------------
+$(binary_stamp)-gccgo-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+
+	rm -rf $(d_go_n)
+	dh_installdirs -p$(p_go_n) $(dirs_go_n)
+
+	$(dh_compat2) dh_movefiles -p$(p_go_n) $(files_go_n)
+
+ifneq (,$(findstring gccgo,$(PKGSOURCE)))
+	rm -rf $(d_go_n)/$(gcc_lib_dir)/include/cilk
+	rm -rf $(d_go_n)/$(gcc_lib_dir)/include/openacc.h
+endif
+
+ifeq ($(with_standalone_go),yes)
+  ifeq ($(with_gomp),yes)
+	mv $(d)/$(usr_lib)/libgomp*.spec $(d_go_n)/$(gcc_lib_dir)/
+  endif
+  ifeq ($(with_cc1),yes)
+	rm -f $(d)/$(usr_lib)/libcc1.so
+	dh_link -p$(p_go_n) \
+		/$(usr_lib)/libcc1.so.$(CC1_SONAME) /$(gcc_lib_dir)/libcc1.so
+  endif
+endif
+
+	echo '$(p_go_n) binary: unstripped-binary-or-object' \
+	  > $(d_go_n)/usr/share/lintian/overrides/$(p_go_n)
+	echo '$(p_go_n) binary: hardening-no-pie' \
+	  >> $(d_go_n)/usr/share/lintian/overrides/$(p_go_n)
+ifeq ($(GFDL_INVARIANT_FREE),yes)
+	echo '$(p_go_n) binary: binary-without-manpage' \
+	  >> $(d_go_n)/usr/share/lintian/overrides/$(p_go_n)
+endif
+
+	debian/dh_doclink -p$(p_go_n) $(p_xbase)
+
+	debian/dh_rmemptydirs -p$(p_go_n)
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_go_n)/$(gcc_lexec_dir)/go1
+endif
+	dh_strip -v -p$(p_go_n) -X/cgo -X/go$(pkg_ver) -X/gofmt$(pkg_ver) \
+	  -X/buildid -X/test2json -X/vet $(if $(unstripped_exe),-X/go1)
+	dh_shlibdeps -p$(p_go_n)
+	echo $(p_go_n) >> debian/arch_binaries
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gccgo-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_go_h)
+	debian/dh_doclink -p$(p_go_h) $(p_xbase)
+	echo $(p_go_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gccgo-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_go_b)
+	debian/dh_doclink -p$(p_go_b) $(p_cpp_b)
+	echo $(p_go_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
 $(binary_stamp)-gccgo: $(install_stamp)
 	dh_testdir
 	dh_testroot
@@ -250,14 +336,6 @@ $(binary_stamp)-gccgo: $(install_stamp)
 	rm -rf $(d_go)
 	dh_installdirs -p$(p_go) $(dirs_go)
 
-	$(dh_compat2) dh_movefiles -p$(p_go) $(files_go)
-
-ifneq (,$(findstring gccgo,$(PKGSOURCE)))
-	rm -rf $(d_go)/$(gcc_lib_dir)/include/cilk
-	rm -rf $(d_go)/$(gcc_lib_dir)/include/openacc.h
-endif
-
-ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gccgo$(pkg_ver) \
 	    $(d_go)/$(PF)/bin/gccgo$(pkg_ver)
 	ln -sf $(cmd_prefix)go$(pkg_ver) \
@@ -265,46 +343,31 @@ ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gofmt$(pkg_ver) \
 	    $(d_go)/$(PF)/bin/gofmt$(pkg_ver)
   ifneq ($(GFDL_INVARIANT_FREE),yes)
-	ln -sf $(cmd_prefix)gccgo$(pkg_ver).1 \
-	    $(d_go)/$(PF)/share/man/man1/gccgo$(pkg_ver).1
+	ln -sf $(cmd_prefix)gccgo$(pkg_ver).1.gz \
+	    $(d_go)/$(PF)/share/man/man1/gccgo$(pkg_ver).1.gz
   endif
-	ln -sf $(cmd_prefix)go$(pkg_ver).1 \
-	    $(d_go)/$(PF)/share/man/man1/go$(pkg_ver).1
-	ln -sf $(cmd_prefix)gofmt$(pkg_ver).1 \
-	    $(d_go)/$(PF)/share/man/man1/gofmt$(pkg_ver).1
-endif
+	ln -sf $(cmd_prefix)go$(pkg_ver).1.gz \
+	    $(d_go)/$(PF)/share/man/man1/go$(pkg_ver).1.gz
+	ln -sf $(cmd_prefix)gofmt$(pkg_ver).1.gz \
+	    $(d_go)/$(PF)/share/man/man1/gofmt$(pkg_ver).1.gz
 
 ifeq ($(with_standalone_go),yes)
-  ifeq ($(unprefixed_names),yes)
 	for i in gcc gcov gcov-tool gcc-ar gcc-nm gcc-ranlib; do \
 	  ln -sf $(cmd_prefix)$$i$(pkg_ver) \
 	    $(d_go)/$(PF)/bin/$$i$(pkg_ver); \
 	done
-    ifneq ($(GFDL_INVARIANT_FREE),yes)
+  ifneq ($(GFDL_INVARIANT_FREE),yes)
 	for i in gcc gcov gcov-tool gcc-ar gcc-nm gcc-ranlib; do \
-	  ln -sf $(cmd_prefix)gcc$(pkg_ver).1 \
-	    $(d_go)/$(PF)/share/man/man1/$$i$(pkg_ver).1; \
+	  ln -sf $(cmd_prefix)gcc$(pkg_ver).1.gz \
+	    $(d_go)/$(PF)/share/man/man1/$$i$(pkg_ver).1.gz; \
 	done
-    endif
-  endif
-  ifeq ($(with_gomp),yes)
-	mv $(d)/$(usr_lib)/libgomp*.spec $(d_go)/$(gcc_lib_dir)/
-  endif
-  ifeq ($(with_cc1),yes)
-	rm -f $(d)/$(usr_lib)/libcc1.so
-	dh_link -p$(p_go) \
-		/$(usr_lib)/libcc1.so.$(CC1_SONAME) /$(gcc_lib_dir)/libcc1.so
   endif
 endif
 
-	mkdir -p $(d_go)/usr/share/lintian/overrides
-	echo '$(p_go) binary: unstripped-binary-or-object' \
-	  > $(d_go)/usr/share/lintian/overrides/$(p_go)
-	echo '$(p_go) binary: hardening-no-pie' \
-	  >> $(d_go)/usr/share/lintian/overrides/$(p_go)
 ifeq ($(GFDL_INVARIANT_FREE),yes)
+	mkdir -p $(d_go)/usr/share/lintian/overrides
 	echo '$(p_go) binary: binary-without-manpage' \
-	  >> $(d_go)/usr/share/lintian/overrides/$(p_go)
+	  > $(d_go)/usr/share/lintian/overrides/$(p_go)
 endif
 
 	debian/dh_doclink -p$(p_go) $(p_xbase)
@@ -313,13 +376,6 @@ endif
 #		$(d_go)/$(docdir)/$(p_base)/go/changelog
 	debian/dh_rmemptydirs -p$(p_go)
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_go)/$(gcc_lexec_dir)/go1
-endif
-	dh_strip -v -p$(p_go) -X/cgo -X/go$(pkg_ver) -X/gofmt$(pkg_ver) \
-	  -X/buildid -X/test2json -X/vet $(if $(unstripped_exe),-X/go1)
-	dh_shlibdeps -p$(p_go)
 	echo $(p_go) >> debian/arch_binaries
 
 	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)

@@ -60,8 +60,10 @@ ifneq ($(DEB_STAGE),rtlibs)
 
   ifeq ($(with_cxxdev),yes)
     $(lib_binaries)  += libstdcxx-dev
-    ifneq ($(DEB_CROSS),yes)
-      indep_binaries := $(indep_binaries) libstdcxx-doc
+    ifeq ($(with_libcxx_doc),yes)
+      ifneq ($(DEB_CROSS),yes)
+        indep_binaries := $(indep_binaries) libstdcxx-doc
+      endif
     endif
   endif
 endif
@@ -112,6 +114,7 @@ files_dev = \
 	$(PFL)/include/c++/$(BASE_VERSION) \
 	$(gcc_lib_dir)/libstdc++.{a,so} \
 	$(gcc_lib_dir)/libsupc++.a \
+	$(gcc_lib_dir)/libstdc++_libbacktrace.a \
 	$(gcc_lib_dir)/libstdc++fs.a \
 	$(gcc_lib_dir)/libstdc++exp.a
 
@@ -131,6 +134,7 @@ dirs_dbg = \
 files_dbg = \
 	$(usr_lib)/debug/libstdc++.{a,so*} \
 	$(usr_lib)/debug/libstdc++fs.a \
+	$(usr_lib)/debug/libstdc++_libbacktrace.a \
 	$(usr_lib)/debug/libstdc++exp.a
 
 dirs_pic = \
@@ -391,6 +395,7 @@ $(binary_stamp)-libstdcxx-dev: $(libcxxdev_deps)
 	mv $(d)/$(usr_lib)/libsupc++.a $(d)/$(gcc_lib_dir)/
 	mv $(d)/$(usr_lib)/libstdc++fs.a $(d)/$(gcc_lib_dir)/
 	mv $(d)/$(usr_lib)/libstdc++exp.a $(d)/$(gcc_lib_dir)/
+	mv $(d)/$(usr_lib)/libstdc++_libbacktrace.a $(d)/$(gcc_lib_dir)/
 	mv $(d)/$(usr_lib)/libstdc++.{a,so} $(d)/$(gcc_lib_dir)/
 	ln -sf ../../../$(DEB_TARGET_GNU_TYPE)/libstdc++.so.$(CXX_SONAME) \
 		$(d)/$(gcc_lib_dir)/libstdc++.so

@@ -4,7 +4,11 @@ ifneq ($(DEB_STAGE),rtlibs)
   #  arch_binaries  := $(arch_binaries) grs-multi
   #endif
   endif
-  arch_binaries := $(arch_binaries) grs
+  arch_binaries := $(arch_binaries) grs-nat grs-host
+  ifeq ($(unprefixed_names),yes)
+    arch_binaries := $(arch_binaries) grs
+    indep_binaries := $(indep_binaries) grs-build
+  endif
 
   #ifeq ($(with_rsdev),yes)
   #  $(lib_binaries) += libgrs-dev
@@ -58,37 +62,97 @@ ifneq ($(DEB_STAGE),rtlibs)
   endif
 endif
 
-p_grs           = gccrs$(pkg_ver)$(cross_bin_arch)
+p_grs_n		= gccrs$(pkg_ver)-$(subst _,-,$(TARGET_ALIAS))
+p_grs_h		= gccrs$(pkg_ver)-for-host
+p_grs_b		= gccrs$(pkg_ver)-for-build
+p_grs           = gccrs$(pkg_ver)
 p_grs_m		= gccrs$(pkg_ver)-multilib$(cross_bin_arch)
 p_libgrs	= libgrs-$(GRS_SONAME)
 p_libgrsdev	= libgrs$(pkg_ver)-dev
 p_grsd		= grs$(pkg_ver)-doc
 
+d_grs_n		= debian/$(p_grs_n)
+d_grs_h		= debian/$(p_grs_h)
+d_grs_b		= debian/$(p_grs_b)
 d_grs           = debian/$(p_grs)
 d_grs_m		= debian/$(p_grs_m)
 d_libgrs	= debian/$(p_libgrs)
 d_libgrsdev	= debian/$(p_libgrsdev)
 d_grsd		= debian/$(p_grsd)
 
-dirs_grs = \
+dirs_grs_n = \
 	$(PF)/bin \
 	$(PF)/share/man/man1 \
-	$(gcc_lexec_dir)
+	$(gcc_lexec_dir) \
+	usr/share/lintian/overrides
+
+dirs_grs = \
+	$(PF)/bin \
+	$(PF)/share/man/man1
 #ifneq ($(DEB_CROSS),yes)
 #  dirs_grs += \
 #	$(grs_include_dir)
 #endif
 
-files_grs = \
+files_grs_n = \
 	$(PF)/bin/$(cmd_prefix)gccrs$(pkg_ver) \
 	$(gcc_lexec_dir)/rust1
-#    files_grs += \
+
+#    files_grs_n += \
 #	$(PF)/share/man/man1/$(cmd_prefix)gccrs$(pkg_ver).1
 
 dirs_libgrs = \
 	$(PF)/lib \
 	$(grs_include_dir) \
 	$(gcc_lib_dir)
+
+$(binary_stamp)-grs-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+
+	rm -rf $(d_grs_n)
+	dh_installdirs -p$(p_grs_n) $(dirs_grs_n)
+
+	$(dh_compat2) dh_movefiles -p$(p_grs_n) $(files_grs_n)
+
+	dh_installdirs -p$(p_grs_n)
+	debian/dh_doclink -p$(p_grs_n) $(p_xbase)
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_grs_n)/$(gcc_lexec_dir)/rust1
+endif
+	dh_strip -p$(p_grs_n) \
+	  $(if $(unstripped_exe),-X/rustcc1)
+	dh_shlibdeps -p$(p_grs_n)
+
+	echo '$(p_grs_n) binary: hardening-no-pie' \
+	  > $(d_grs_n)/usr/share/lintian/overrides/$(p_grs_n)
+
+	echo $(p_grs_n) >> debian/arch_binaries
+
+	find $(d_grs_n) -type d -empty -delete
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-grs-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_grs_h)
+	debian/dh_doclink -p$(p_grs_h) $(p_xbase)
+	echo $(p_grs_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-grs-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_grs_b)
+	debian/dh_doclink -p$(p_grs_b) $(p_cpp_b)
+	echo $(p_grs_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
 
 $(binary_stamp)-grs: $(install_stamp)
 	dh_testdir
@@ -103,26 +167,12 @@ $(binary_stamp)-grs: $(install_stamp)
 
 	$(dh_compat2) dh_movefiles -p$(p_grs) $(files_grs)
 
-ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gccrs$(pkg_ver) \
 	    $(d_grs)/$(PF)/bin/gccrs$(pkg_ver)
 #	ln -sf $(cmd_prefix)gccrs$(pkg_ver).1 \
 #	    $(d_grs)/$(PF)/share/man/man1/gccrs$(pkg_ver).1
-endif
 	dh_installdirs -p$(p_grs)
 	debian/dh_doclink -p$(p_grs) $(p_xbase)
-
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_grs)/$(gcc_lexec_dir)/rust1
-endif
-	dh_strip -p$(p_grs) \
-	  $(if $(unstripped_exe),-X/rustcc1)
-	dh_shlibdeps -p$(p_grs)
-
-	mkdir -p $(d_grs)/usr/share/lintian/overrides
-	echo '$(p_grs) binary: hardening-no-pie' \
-	  > $(d_grs)/usr/share/lintian/overrides/$(p_grs)
 
 	echo $(p_grs) >> debian/arch_binaries
 

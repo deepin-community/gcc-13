@@ -41,7 +41,7 @@ gcc/fortran/ChangeLog:
 --- a/src/gcc/fortran/Make-lang.in
 +++ b/src/gcc/fortran/Make-lang.in
 @@ -116,7 +116,9 @@ fortran.tags: force
- 	cd $(srcdir)/fortran; $(ETAGS) -o TAGS.sub *.c *.h; \
+ 	cd $(srcdir)/fortran; $(ETAGS) -o TAGS.sub *.cc *.h; \
  	$(ETAGS) --include TAGS.sub --include ../TAGS.sub
  
 -fortran.info: doc/gfortran.info doc/gfc-internals.info
@@ -93,7 +93,7 @@ gcc/fortran/ChangeLog:
  # Clean hooks:
 --- a/src/gcc/Makefile.in
 +++ b/src/gcc/Makefile.in
-@@ -3304,8 +3304,31 @@ install-no-fixedincludes:
+@@ -3335,8 +3335,31 @@ install-no-fixedincludes:
  
  doc: $(BUILD_INFO) $(GENERATED_MANPAGES)
  
@@ -127,7 +127,7 @@ gcc/fortran/ChangeLog:
  
  info: $(INFOFILES) lang.info @GENINSRC@ srcinfo lang.srcinfo
  
-@@ -3353,7 +3376,20 @@ gcc-vers.texi: $(BASEVER) $(DEVPHASE)
+@@ -3384,7 +3407,20 @@ gcc-vers.texi: $(BASEVER) $(DEVPHASE)
  	if [ -n "$(PKGVERSION)" ]; then \
  	  echo "@set VERSION_PACKAGE $(PKGVERSION)" >> $@T; \
  	fi
@@ -149,7 +149,7 @@ gcc/fortran/ChangeLog:
  	mv -f $@T $@
  
  
-@@ -3361,21 +3397,41 @@ gcc-vers.texi: $(BASEVER) $(DEVPHASE)
+@@ -3392,21 +3428,41 @@ gcc-vers.texi: $(BASEVER) $(DEVPHASE)
  # patterns.  To use them, put each of the specific targets with its
  # specific dependencies but no build commands.
  
@@ -198,7 +198,7 @@ gcc/fortran/ChangeLog:
  			-I $(gcc_docdir)/include -o $@ $<; \
  	fi
  
-@@ -3785,11 +3841,11 @@ install-driver: installdirs xgcc$(exeext
+@@ -3810,11 +3866,11 @@ install-driver: installdirs xgcc$(exeext
  # $(INSTALL_DATA) might be a relative pathname, so we can't cd into srcdir
  # to do the install.
  install-info:: doc installdirs \
@@ -215,7 +215,7 @@ gcc/fortran/ChangeLog:
  	lang.install-info
  
  $(DESTDIR)$(infodir)/%.info: doc/%.info installdirs
-@@ -4028,8 +4084,11 @@ uninstall: lang.uninstall
+@@ -4053,8 +4109,11 @@ uninstall: lang.uninstall
  	-rm -rf $(DESTDIR)$(bindir)/$(GCOV_INSTALL_NAME)$(exeext)
  	-rm -rf $(DESTDIR)$(man1dir)/$(GCC_INSTALL_NAME)$(man1ext)
  	-rm -rf $(DESTDIR)$(man1dir)/cpp$(man1ext)
@@ -239,7 +239,7 @@ gcc/fortran/ChangeLog:
 +* gnat-style: (gnat-style-13).      GNAT Coding Style
  @end direntry
  
- @definfoenclose strong,`,'
+ @c %**end of header
 --- a/src/gcc/ada/gnat_rm.texi
 +++ b/src/gcc/ada/gnat_rm.texi
 @@ -12,7 +12,7 @@
@@ -247,13 +247,13 @@ gcc/fortran/ChangeLog:
  @dircategory GNU Ada Tools 
  @direntry
 -* gnat_rm: (gnat_rm.info). gnat_rm
-+* GNAT Reference Manual: (gnat_rm-10).  Reference Manual for GNU Ada tools.
++* GNAT Reference Manual: (gnat_rm-13).  Reference Manual for GNU Ada tools.
  @end direntry
  
- @definfoenclose strong,`,'
+ @c %**end of header
 --- a/src/gcc/doc/invoke.texi
 +++ b/src/gcc/doc/invoke.texi
-@@ -16647,7 +16647,7 @@ One of the standard libraries bypassed b
+@@ -17737,7 +17737,7 @@ One of the standard libraries bypassed b
  @option{-nodefaultlibs} is @file{libgcc.a}, a library of internal subroutines
  which GCC uses to overcome shortcomings of particular machines, or special
  needs for some languages.
@@ -262,7 +262,7 @@ gcc/fortran/ChangeLog:
  Collection (GCC) Internals},
  for more discussion of @file{libgcc.a}.)
  In most cases, you need @file{libgcc.a} even when you want to avoid
-@@ -16656,7 +16656,7 @@ or @option{-nodefaultlibs} you should us
+@@ -17746,7 +17746,7 @@ or @option{-nodefaultlibs} you should us
  This ensures that you have no unresolved references to internal GCC
  library subroutines.
  (An example of such an internal subroutine is @code{__main}, used to ensure C++
@@ -270,8 +270,8 @@ gcc/fortran/ChangeLog:
 +constructors are called; @pxref{Collect2,,@code{collect2}, @value{fngccint},
  GNU Compiler Collection (GCC) Internals}.)
  
- @item -e @var{entry}
-@@ -34111,7 +34111,7 @@ Note that you can also specify places to
+ @opindex nostdlib++
+@@ -35202,7 +35202,7 @@ Note that you can also specify places to
  @option{-B}, @option{-I} and @option{-L} (@pxref{Directory Options}).  These
  take precedence over places specified using environment variables, which
  in turn take precedence over those specified by the configuration of GCC@.
@@ -280,7 +280,7 @@ gcc/fortran/ChangeLog:
  GNU Compiler Collection (GCC) Internals}.
  
  @table @env
-@@ -34291,7 +34291,7 @@ the headers it contains change.
+@@ -35382,7 +35382,7 @@ the headers it contains change.
  
  A precompiled header file is searched for when @code{#include} is
  seen in the compilation.  As it searches for the included file
@@ -291,7 +291,7 @@ gcc/fortran/ChangeLog:
  the name specified in the @code{#include} with @samp{.gch} appended.  If
 --- a/src/gcc/doc/extend.texi
 +++ b/src/gcc/doc/extend.texi
-@@ -24503,7 +24503,7 @@ want to write code that checks whether t
+@@ -24639,7 +24639,7 @@ want to write code that checks whether t
  test for the GNU compiler the same way as for C programs: check for a
  predefined macro @code{__GNUC__}.  You can also use @code{__GNUG__} to
  test specifically for GNU C++ (@pxref{Common Predefined Macros,,
@@ -353,7 +353,7 @@ gcc/fortran/ChangeLog:
  
 --- a/src/gcc/doc/gcc.texi
 +++ b/src/gcc/doc/gcc.texi
-@@ -129,7 +129,7 @@ version @value{version-GCC}.
+@@ -135,7 +135,7 @@ version @value{version-GCC}.
  The internals of the GNU compilers, including how to port them to new
  targets and some information about how to write front ends for new
  languages, are documented in a separate manual.  @xref{Top,,
@@ -397,7 +397,7 @@ gcc/fortran/ChangeLog:
  This manual documents libgomp, the GNU Offloading and Multi Processing
 --- a/src/libgomp/Makefile.in
 +++ b/src/libgomp/Makefile.in
-@@ -610,7 +610,8 @@ info_TEXINFOS = libgomp.texi
+@@ -613,7 +613,8 @@ info_TEXINFOS = libgomp.texi
  
  # AM_CONDITIONAL on configure check ACX_CHECK_PROG_VER([MAKEINFO])
  @BUILD_INFO_TRUE@STAMP_BUILD_INFO = stamp-build-info
@@ -407,7 +407,7 @@ gcc/fortran/ChangeLog:
  MAINTAINERCLEANFILES = $(srcdir)/libgomp.info
  MULTISRCTOP = 
  MULTIBUILDTOP = 
-@@ -1390,15 +1391,16 @@ env.lo: libgomp_f.h
+@@ -1393,15 +1394,16 @@ env.lo: libgomp_f.h
  env.o: libgomp_f.h
  
  all-local: $(STAMP_GENINSRC)
@@ -431,7 +431,7 @@ gcc/fortran/ChangeLog:
  # target overrides
 --- a/src/libgomp/Makefile.am
 +++ b/src/libgomp/Makefile.am
-@@ -128,14 +128,16 @@ endif
+@@ -129,14 +129,16 @@ endif
  
  all-local: $(STAMP_GENINSRC)
  
@@ -443,7 +443,7 @@ gcc/fortran/ChangeLog:
  
 -libgomp.info: $(STAMP_BUILD_INFO)
 +libgomp.info: $(INFO_LIBGOMP_NAME).info
-+	cp $(INFO_LIBGOMP_NAME).info libgomp.info
++	[ "$(INFO_LIBGOMP_NAME).info = libgomp.info ] || cp $(INFO_LIBGOMP_NAME).info libgomp.info
 +$(INFO_LIBGOMP_NAME).info: $(STAMP_BUILD_INFO)
  
  stamp-build-info: libgomp.texi
@@ -478,7 +478,7 @@ gcc/fortran/ChangeLog:
  
 -libitm.info: $(STAMP_BUILD_INFO)
 +libitm.info: $(INFO_LIBITM_NAME).info
-+       cp $(INFO_LIBITM_NAME).info libitm.info
++	[ $(INFO_LIBITM_NAME).info = libitm.info ] || cp $(INFO_LIBITM_NAME).info libitm.info
 +$(INFO_LIBITM_NAME).info: $(STAMP_BUILD_INFO)
  
  stamp-build-info: libitm.texi
@@ -502,7 +502,7 @@ gcc/fortran/ChangeLog:
  
 -libitm.info: $(STAMP_BUILD_INFO)
 +libitm.info: $(INFO_LIBITM_NAME).info
-+	cp $(INFO_LIBITM_NAME).info libitm.info
++	[ $(INFO_LIBITM_NAME).info = libitm.info ] || cp $(INFO_LIBITM_NAME).info libitm.info
 +$(INFO_LIBITM_NAME).info: $(STAMP_BUILD_INFO)
  
  stamp-build-info: libitm.texi

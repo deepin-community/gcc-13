@@ -11,7 +11,14 @@ Description: adapt libgnat build for Debian
  Compile with -gnatn for efficiency.
  Double-check the link since Debian moves some symbols.
  .
- Please read ada-changes-in-autogen-output.diff about src/Makefile.def.
+ Autogen should refresh src/Makefile.in from src/Makefile.{def,tpl}
+ at build time, but we do not want to Build-Depend: guile.
+ # export QUILT_PATCHES=debian/patches
+ # quilt pop $this.diff
+ # quilt add src/Makefile.in
+ # (cd src && autogen Makefile.def)
+ # quilt refresh --no-timestamps --no-index -pab
+ # quilt push -a
 Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=786692
 Forwarded: not-needed
 Author: Ludovic Brenta <lbrenta@debian.org>
@@ -75,7 +82,7 @@ Author: Matthias Klose <doko@debian.org>
          "PICFLAG_FOR_TARGET=$(PICFLAG)" \
 --- a/src/Makefile.def
 +++ b/src/Makefile.def
-@@ -392,6 +392,7 @@ dependencies = { module=all-libcpp; on=a
+@@ -393,6 +393,7 @@ dependencies = { module=all-libcpp; on=a
  
  dependencies = { module=all-fixincludes; on=all-libiberty; };
  

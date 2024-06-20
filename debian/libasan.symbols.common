@@ -298,7 +298,7 @@
  __interceptor_canonicalize_file_name@Base 4.9
  __interceptor_capget@Base 5
  __interceptor_capset@Base 5
- __interceptor_cfree@Base 4.8
+ (arch=!riscv64)__interceptor_cfree@Base 4.8
  __interceptor_clock_getcpuclockid@Base 11
  __interceptor_clock_getres@Base 4.9
  __interceptor_clock_gettime@Base 4.9
@@ -659,7 +659,7 @@
  __interceptor_uname@Base 11
  __interceptor_valloc@Base 4.8
  __interceptor_vasprintf@Base 5
- (arch=armel arm64 any-i386 any-amd64)__interceptor_vfork@Base 10
+ (arch=armel arm64 any-i386 any-amd64 riscv64)__interceptor_vfork@Base 10
  __interceptor_vfprintf@Base 5
  __interceptor_vfscanf@Base 4.8
  __interceptor_vprintf@Base 5
@@ -1517,7 +1517,7 @@
  canonicalize_file_name@Base 4.9
  capget@Base 5
  capset@Base 5
- cfree@Base 4.8
+ (arch=!riscv64)cfree@Base 4.8
  clock_getcpuclockid@Base 11
  clock_getres@Base 4.9
  clock_gettime@Base 4.9
@@ -1878,7 +1878,7 @@
  uname@Base 11
  valloc@Base 4.8
  vasprintf@Base 5
- (arch=armel arm64 any-i386 any-amd64)vfork@Base 10
+ (arch=armel arm64 any-i386 any-amd64 riscv64)vfork@Base 10
  vfprintf@Base 5
  vfscanf@Base 4.8
  vprintf@Base 5

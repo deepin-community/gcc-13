@@ -1,20 +1,433 @@
-gcc-13 (13.2.0-3deepin2) unstable; urgency=medium
+gcc-13 (13.3.0-1) unstable; urgency=medium
 
-  * add lsx support
+  * GCC 13.3.0 release.
+  * Update to git 20240619 from the gcc-13 branch.
+    - Fix PR target/115297 (alpha), PR tree-optimization/115307 (AVR),
+      PR target/113281, PR tree-optimization/115192, PR target/113719 (x86),
+      PR tree-optimization/115152, PR sanitizer/115172,
+      PR tree-optimization/115143, PR tree-optimization/115154,
+      PR c++/111529, PR c++/113598, PR libstdc++/107800, PR fortran/115150,
+      PR fortran/114827, PR fortran/110415, PR fortran/115039,
+      PR libstdc++/115269, PR libstdc++/114940, PR libstdc++/108976,
+      PR target/115253 (ARM), PR tree-optimization/115337, PR middle-end/108789,
+      PR target/115324 (PPC), PR rtl-optimization/114902,
+      PR rtl-optimization/115092, PR c/115290, PR c/114493, PR c++/115511,
+      PR target/111343, PR jit/115442, PR target/115360 (AM),
+      PR libstdc++/115308, PR libstdc++/115247, PR libstdc++/114958.
+  * Update newlib to 4.4.0.
+  * Add sparc64 bits for the gcc-as-needed patch. Closes: #1070766.
 
- -- Chang Yang <yangchang@deepin.org>  Wed, 10 Apr 2024 11:42:36 +0800
+ -- Matthias Klose <doko@debian.org>  Wed, 19 Jun 2024 16:43:00 +0200
 
-gcc-13 (13.2.0-3deepin1) unstable; urgency=medium
+gcc-13 (13.2.0-25) unstable; urgency=medium
 
-  * feat: use gcc-13 to build gcc-13
+  * Update to git 20240514 from the gcc-13 branch.
+    - Fix PR rtl-optimization/54052, PR middle-end/114348,
+      PR middle-end/112684, PR driver/111700, PR rtl-optimization/114415,
+      PR tree-optimization/111009, PR tree-optimization/114965,
+      PR middle-end/114907, PR sanitizer/114956, PR tree-optimization/114876,
+      PR fortran/114825, PR tree-optimization/114375,
+      PR rtl-optimization/114924, PR tree-optimization/111268,
+      PR target/110792 (x86), PR middle-end/112732, PR tree-optimization/112281,
+      PR tree-optimization/112991, PR middle-end/113396,
+      PR tree-optimization/113831, PR tree-optimization/114121,
+      PR target/114747 (RISCV), PR ipa/92606, PR tree-optimization/114799,
+      PR tree-optimization/114787, PR middle-end/114734,
+      PR tree-optimization/114246, PR tree-optimization/113630,
+      PR tree-optimization/114749, PR tree-optimization/114736,
+      PR gcov-profile/114715, PR lto/114655, PR tree-optimization/114733,
+      PR tree-optimization/114485, PR tree-optimization/111882,
+      PR tree-optimization/114672, PR target/101865 (PPC),
+      PR target/113095 (RISCV), PR target/111600, PR target/114848 (LOONG),
+      PR target/111234, PR analyzer/114408, PR analyzer/114473,
+      PR analyzer/109251, PR analyzer/111289, PR analyzer/113253,
+      PR analyzer/112969, PR analyzer/113333, PR analyzer/112790,
+      PR analyzer/112889, PR analyzer/110882, PR analyzer/110700,
+      PR analyzer/109577, PR analyzer/110112, PR c++/89224, PR c++/114709,
+      PR c++/111284, PR c++/89224, PR c++/113141, PR c++/114377,
+      PR c++/114561, PR c++/114562, PR c++/100667, PR fortran/89462,
+      PR fortran/93678, PR fortran/113956, PR fortran/114535,
+      PR fortran/106999, PR fortran/112407, PR fortran/36337,
+      PR fortran/110987, PR fortran/113885, PR fortran/114739,
+      PR libstdc++/114803, PR libstdc++/114750, PR libstdc++/109822,
+      PR libstdc++/110054, PR libstdc++/110050, PR libstdc++/93672,
+      PR libstdc++/104606, PR libstdc++/114863.
 
- -- Chang Yang <yangchang@deepin.org>  Thu, 07 Mar 2024 10:58:05 +0800
+  [ Nicolas Boulenguez ]
+  * Ada: fix a typo in patch for PR ada/114065 breaking the build on hurd.
 
-gcc-13 (13.2.0-3deepin) unstable; urgency=medium
+  [ Matthias Klose ]
+  * gcc-13: Depend on cpp-13, lost with the -for-build/-for-host changes.
+  * Run the tests again during the build.
+  * Turn on again PGO and LTO builds.
 
-  * Add pie support on Deepin and Uos.
+ -- Matthias Klose <doko@debian.org>  Tue, 14 May 2024 09:58:45 +0200
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Thu, 28 Sep 2023 11:49:29 +0800
+gcc-13 (13.2.0-24) unstable; urgency=medium
+
+  * Update to git 20240429 from the gcc-13 branch.
+    - Fix PR target/114175 (RISCV), PR middle-end/111632,
+      PR tree-optimization/111407, PR target/113233 (loong64),
+      PR target/105522 (Darwin), PR target/114175, PR tree-optimization/112303,
+      PR middle-end/111151, PR sanitizer/111736, PR middle-end/111683,
+      PR bootstrap/114369, PR c++/103825, PR fortran/103707,
+      PR fortran/106987, PR fortran/113799, PR fortran/95374, PR fortran/104352,
+      PR fortran/107426, PR fortran/113866, PR fortran/50410, PR fortran/103716,
+      PR middle-end/111632, PR libgcc/111731, PR libstdc++/114401,
+      PR libstdc++/113841, PR libstdc++/114367, PR target/114130 (RISCV),
+      PR ipa/108007, PR ipa/112616, PR fortran/114474, PR bootstrap/106472,
+      PR target/114272 (AArch64), PR target/114837 (ARM), PR target/88309 (PPC),
+      PR target/114172 (RISCV), PR rtl-optimization/114768,
+      PR middle-end/114753, PR sanitizer/114743, PR c++/114634,
+      PR sanitizer/114687, PR middle-end/110027, PR tree-optimization/114566,
+      PR c++/114537, PR middle-end/114552, PR ipa/113964, PR ipa/111571,
+      PR target/114752 (AVR), PR middle-end/114599, PR gcov-profile/114115,
+      PR tree-optimization/114115, PR tree-optimization/113552,
+      PR c/114780, PR c++/114691, PR c++/114580, PR c++/114572,
+      PR c++/113966, PR c++/110006, PR c++/112769, PR fortran/102003,
+      PR target/114794 (AVR), PR libfortran/114304, PR libfortran/105473,
+      PR libquadmath/114533.
+  * Use gcc:SoftVersion for -for-host dependencies (Helmut Grohne).
+    Addresses: #1067904.
+  * Apply proposed patch for PR libquadmath/114533 (Simon Chopin).
+    Addresses: #1064426. LP: #2052929.
+  * Don't build the libstdc++-doc package when the nodoc profile is enabled.
+  * Integrate gnat patches from Nicolas:
+    - Update the ada-lib-info-source-date-epoch patch.
+    - Remove the pr114065-proposed patch.
+    - Add patches (v6) from PR ada/114065.  Closes: #1067453.
+    - Only apply ada-armel-libatomic.diff on armel.
+  * Don't set the _FILE_OFFSET_BITS and _TIME_BITS macros, if the
+    _DISTRO_EVADE_TIME_BITS macro is defined.
+    See https://sourceware.org/bugzilla/show_bug.cgi?id=31624.
+  * Build using GCC 13.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 29 Apr 2024 11:49:21 +0200
+
+gcc-13 (13.2.0-23) unstable; urgency=medium
+
+  * Only apply newlib patches when the newlib tarball is unpacked.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 28 Mar 2024 14:30:10 +0100
+
+gcc-13 (13.2.0-22) unstable; urgency=medium
+
+  * Update to git 20240328 from the gcc-13 branch.
+    - Fix PR sanitizer/97696, PR tree-optimization/110838,
+      PR tree-optimization/91838, PR c/112571.
+  * Fix PR target/110934 (m68k), taken from the trunk.
+  * d/p/gcc-distro-defaults: Make -fstack-protector-explicit known.
+  * newlib: amdgcn: Implement proper locks, taken from newlib trunk.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 28 Mar 2024 11:29:26 +0100
+
+gcc-13 (13.2.0-21) unstable; urgency=medium
+
+  * Update to git 20240324 from the gcc-13 branch.
+    - Fix PR fortran/101135, PR fortran/55978.
+  * Update the proposed patch to fix PR ada/114065.
+  * Move the _FORTIFY_SOURCE setting from cc1 to the driver.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 24 Mar 2024 14:49:13 +0100
+
+gcc-13 (13.2.0-20) unstable; urgency=medium
+
+  * Update to git 20240323 from the gcc-13 branch.
+    - Fix PR other/109668, PR tree-optimization/114231,
+      PR tree-optimization/112793, PR tree-optimization/113670,
+      PR middle-end/113622, PR tree-optimization/114203, PR middle-end/114070,
+      PR middle-end/114070, PR tree-optimization/114027, PR debug/112718,
+      PR tree-optimization/113910, PR tree-optimization/111736,
+      PR tree-optimization/114396, PR target/113950 (PPC),
+      PR target/111822 (x86), PR target/114160 (RISCV), PR sanitizer/112709,
+      PR sanitizer/112709, PR target/114339 (x86), PR middle-end/113907,
+      PR target/114310 (AArch64), PR rtl-optimization/110079,
+      PR rtl-optimization/114211, PR target/114184 (x86), PR fortran/114001,
+      PR fortran/103715, PR fortran/110826, PR fortran/100988,
+      PR fortran/104819, PR libstdc++/66146, PR libstdc++/114316,
+      PR libstdc++/114147.
+  * Make vhdl known to the PPC backend.
+  * Use the proposed patch to fix PR ada/114065, 64bit definitions for
+    time_t_bits type on 32bit archs.
+  * libsanitizer: Remove crypt and crypt_r interceptors for releases
+    with glibc (>= 2.31). Remove the build hacks for crypt.h.
+  * libstdc++-dev: Install libstdc++_libbacktrace.a. Note that all Filesystem TS
+    and std::stacktrace symbols were added to libstdc++exp.a and GCC 14 stops
+    shipping libstdc++_libbacktrace.a. Closes: #1065359.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 23 Mar 2024 11:38:07 +0100
+
+gcc-13 (13.2.0-19) unstable; urgency=medium
+
+  * Update to git 20240315 from the gcc-13 branch.
+    - Fix PR middle-end/95351, PR driver/114314, PR target/101737 (SH),
+      PR ada/113979, PR d/112285, PR d/112290, PR d/114171, PR fortran/114012,
+      PR fortran/114024, PR libfortran/105437, PR libfortran/114304,
+      PR libfortran/105473, PR libstdc++/110167.
+  * Fix installation of the amdgcn offload compiler.
+  * Fix installation of the nvptx offload compiler. Closes: #1065598.
+  * ASan: move allocator base to avoid conflict with high-entropy ASLR
+    for x86-64 Linux. Patch taken from LLVM. LP: #2048768.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 15 Mar 2024 17:33:18 +0100
+
+gcc-13 (13.2.0-18) unstable; urgency=medium
+
+  * Remove build-dependency on gdb for now.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 03 Mar 2024 17:28:27 +0100
+
+gcc-13 (13.2.0-17) unstable; urgency=medium
+
+  * Update to git 20240303 from the gcc-13 branch.
+    - Fix PR middle-end/114136, PR tree-optimization/114041,
+      PR tree-optimization/114090, PR tree-optimization/113993,
+      PR c++/113674, PR middle-end/110754, PR rtl-optimization/113656,
+      PR tree-optimization/113603, PR target/113122 (x86),
+      PR tree-optimization/113372, PR middle-end/90348, PR middle-end/110115,
+      PR middle-end/111422, PR rtl-optimization/112758,
+      PR target/108174 (AArch64), PR target/114098 (x86),
+      PR target/108120 (ARM), PR tree-optimization/109804,
+      PR target/112299 (loong64), PR target/112330 (loong64), PR ada/113893,
+      PR c/114007, PR c/113262, PR d/113758, PR d/113125, PR libgomp/113192,
+      PR libstdc++/113960, PR libstdc++/114152.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 03 Mar 2024 11:19:43 +0100
+
+gcc-13 (13.2.0-16.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Upload to unstable to start the 64-bit time_t transition.
+
+ -- Steve Langasek <vorlon@debian.org>  Mon, 26 Feb 2024 21:24:11 +0000
+
+gcc-13 (13.2.0-16) experimental; urgency=medium
+
+  * libgnat: Use Long_Long_Integer'Size for the definition of time_t_bits
+    for 32bit architectures using time_t64.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 22 Feb 2024 04:05:15 +0100
+
+gcc-13 (13.2.0-14) experimental; urgency=medium
+
+  * Update to git 20240220 from the gcc-13 branch.
+    - Fix PR target/112787, PR middle-end/113921, PR target/113927 (AVR),
+      PR target/105523 (AVR), PR target/113824 (AVR),
+      PR target/111677 (AArch64, closes: #1053405),
+      PR tree-optimization/112618, PR tree-optimization/112505,
+      PR tree-optimization/112495, PR tree-optimization/110221,
+      PR middle-end/110176, PR c++/95226, PR c++/109359, PR c++/113545,
+      PR c++/113612, PR c++/107291, PR c++/111286, PR c++/110084, PR c++/113638,
+      PR c++/112439, PR c++/112437, PR fortran/104908, PR libgcc/113850,
+      PR libfortran/111022, PR libfortran/110651, PR libstdc++/113294,
+      PR libstdc++/99117, PR libstdc++/112467, PR libstdc++/110807,
+      PR libstdc++/113258, PR libstdc++/107466, PR libstdc++/90276,
+      PR libstdc++/113500, PR libstdc++/113512.
+  * Add more dependencies for -for-build packages.
+  * Build libubsan1 for riscv64.
+  * Pass -D_TIME_BITS=64 together with -D_FILE_OFFSET_BITS=64 by default
+    on the 32bit architectures armel, armhf, hppa, m68k, mips, mipsel,
+    powerpc (-m32 only) and sh4.
+  * Fix disabling go and m2 according to OS (Samuel Thibault). Closes: #1063642.
+  * PR libstdc++/99832, std::chrono::system_clock::{from,to}_time_t:
+    Add ABI tag for timet64.
+  * Fix libsanitizer build with _TIME_BITS set.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 22 Feb 2024 00:15:36 +0100
+
+gcc-13 (13.2.0-13) unstable; urgency=medium
+
+  * Update to git 20240130 from the gcc-13 branch.
+    - Fix PR preprocessor/105608.
+  * Fix and add dependencies for -for-build and -for-host packages.
+  * Correct conflicts with old gnat-N versions. Closes: #1061648.
+  * Fix some -for-{build,host} package descriptions. Addresses: #1061670.
+  * For Ubuntu, only define _FORTIFY_SOURCE, if there are no options
+    -U_FORTIFY_SOURCE or -D_FORTIFY_SOURCE=N given.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 30 Jan 2024 14:43:53 +0100
+
+gcc-13 (13.2.0-12) unstable; urgency=medium
+
+  * Update to git 20240127 from the gcc-13 branch.
+    - Fix PR target/113601 (AVR), PR tree-optimization/110422, PR c++/113529,
+      PR c++/113347, PR c++/103185, PR c++/113088, PR c++/33799.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 27 Jan 2024 09:26:36 +0100
+
+gcc-13 (13.2.0-11) experimental; urgency=medium
+
+  [ Matthias Klose ]
+  * Fall-back to the host crypt.h for the target, required by cross builds.
+    See: #1014375.
+  * Fix PR target/113030, taken from the trunk.
+  * Don't include -Xliblto_plugin.so for dh_fixperms call.
+  * Mark *-N-for-{build,host} packages as dependency packages.
+  * Stop building packages built by gcc-14.
+
+  [ Helmut Grohne ]
+  * Build $triplet packages:
+    {cpp,gcc,g++,gfortran,gdc,gobjc,gobjc++,gccgo,gnat,gm2,gccrs}-13-$triplet
+  * Use cross_gencontrol for *-for-host packages.
+  * Add packages {cpp,gcc,g++,gfortran,gdc,gobjc,gobjc++}-N-for-{build,host}.
+  * Add packages {gccgo,gnat,gm2,gccrs}-N-for-{build,host}.
+  * Restrict $tool-$v-$triplet packages via ${tool}_no_archs.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 23 Jan 2024 22:00:03 +0100
+
+gcc-13 (13.2.0-10) unstable; urgency=medium
+
+  * Update to git 20240119 from the gcc-13 branch.
+    - Fix PR target/112759 (MIPS), PR sanitizer/111736, PR target/112816 (x86),
+      PR tree-optimization/113013, PR middle-end/112733, PR c++/108975,
+      PR sanitizer/112727, PR fortran/97592, PR target/107201 (AVR),
+      PR target/113156 (AVR), PR tree-optimization/113012,
+      PR rtl-optimization/113140, PR target/112952 (AVR), PR ada/112781,
+      PR c++/113242, PR c++/99493, PR c++/104634, PR c++/109899,
+      PR fortran/67277, PR libstdc++/113450, PR testsuite/113366,
+      PR libstdc++/112477, PR libstdc++/113250, PR libstdc++/113241,
+      PR libstdc++/113200, PR testsuite/113175.
+
+  [ Matthias Klose ]
+  * Set {go,m2,rs}_no_archs macros for the generation of the control file.
+  * Remove trailing whitespace in control file.
+  * Disable the LTO build on mips64el (requested by YunQiang Su).
+  * Configure with --enable-libstdcxx-backtrace. LP: #2048233.
+  * Update the testsuite-hardening patches, and apply them again.
+  * libgcc-s[124]: move libgcc_s.so.? to /usr for DEP17. Closes: #1060001.
+
+  [ Helmut Grohne ]
+  * Add loong64 to any_archs.
+  * Always issue a build-dependency on debhelper.
+  * For cross toolchain builds, add a build dependency on target binutils.
+  * For cross toolchain builds, add build dependencies on the Ada, D and
+    Modula-2 frontends.
+  * Remove redundant sections and priorities for non-tools in the control file.
+  * Remove redundant sections and priorities for tools in the control file.
+  * Add support code for gcc-for-host.
+    - control.m4 macro for_each_arch iterates over all known architectures and
+      substitutes arch_deb (the Debian architecture name), arch_gnu (the GNU
+      triplet) and arch_gnusuffix (a package name suffix encoding the
+      architecture) variables.
+    - The substitution variable target:suffix can be used to interpolate the
+      current target architecture suffix for dependencies from the regular
+      tool packages on architecture-qualified tool packages.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 19 Jan 2024 12:40:38 +0100
+
+gcc-13 (13.2.0-9) unstable; urgency=medium
+
+  * Update to git 20231214 from the gcc-13 branch.
+    - Fix PR target/112891 (x86), PR target/112845 (x86),
+      PR target/112837 (x86), PR target/112816 (x86), PR target/111408 (x86),
+      PR tree-optimization/111967, PR c/112339, PR c++/110106, PR c++/112410,
+      PR c++/109876, PR c++/112795, PR fortran/93762, PR fortran/100651,
+      PR libgomp/111413, PR libstdc++/111826, PR libstdc++/111948,
+      PR libstdc++/112480, PR libstdc++/112473, PR libstdc++/112832,
+      PR libstdc++/110133.
+  * Backport libiberty: Use x86 HW optimized sha1 and followup patch,
+    needed for the combined build.
+  * Use DEB_BUILD_OPTIONS='... gcc-ice=nodump' for turning off dumping
+    the preprocessed source to stdout. Closes: #1057635.
+  * Set DEB_BUILD_OPTIONS='... gcc-ice=nodump' when running the testsuite.
+  * Default to pie on loong64. Closes: #1057433.
+  * For Ubuntu 24.04 LTS and later, switch _FORTIFY_SOURCE to 3 by default
+    instead of 2 when optimization is enabled. LP: #2012440.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 14 Dec 2023 19:55:12 +0100
+
+gcc-13 (13.2.0-8) unstable; urgency=medium
+
+  * Update to git 20231202 from the gcc-13 branch.
+    - Fix PR middle-end/111497, PR tree-optimization/111465,
+      PR tree-optimization/111137, PR c++/111703, PR c++/107939, PR c++/112269,
+      PR fortran/111880, PR fortran/112764, PR libstdc++/112607.
+  * Add changes for hurd-amd64 (Samuel Thibault). Closes: #1057004.
+  * Remove references to obsolete CPUs m32r and tilegx. Closes: #1056769.
+  * Make the libsframe and gprofng toplevel directories known.
+  * Build the nvptx offload compiler on arm64.
+  * Add support to build from a combined binutils/GCC tree.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 02 Dec 2023 23:46:29 +0100
+
+gcc-13 (13.2.0-7) unstable; urgency=medium
+
+  * Update to git 20231124 from the gcc-13 branch.
+    - Fix PR target/112672 (x86), PR target/111815 (vax), PR target/53372 (avr),
+      PR target/111828 (PPC), PR tree-optimization/112496,
+      PR target/110411 (PPC), PR tree-optimization/111917, PR middle-end/111818,
+      PR tree-optimization/111764, PR tree-optimization/111614,
+      PR tree-optimization/111583, PR tree-optimization/111489,
+      PR tree-optimization/111489, PR tree-optimization/111445,
+      PR tree-optimization/111397, PR target/112443 (x86),
+      PR target/111935 (RISCV), PR tree-optimization/111820,
+      PR tree-optimization/111833, PR middle-end/111253, PR c++/112633,
+      PR c++/112301, PR c++/102191, PR c++/33799, PR d/110712, PR d/112270,
+      PR fortran/97245, PR fortran/112316, PR fortran/67740, PR modula2/112110,
+      PR libstdc++/112491, PR libstdc++/112348, PR libstdc++/112491,
+      PR libstdc++/110944, PR libstdc++/111172, PR libstdc++/112314,
+      PR libstdc++/112089, PR libbacktrace/111315, PR libbacktrace/112263,
+      PR libstdc++/111936.
+    - Bump LTO minor version.
+  * Don't run the testsuite on mipsel and mips64el, times out on the buildds.
+    Addresses: #1056238.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 24 Nov 2023 11:53:24 +0100
+
+gcc-13 (13.2.0-6) unstable; urgency=medium
+
+  * Update to git 20231024 from the gcc-13 branch.
+    - Fix PR target/111001 (SH), PR target/111367 (PPC), PR target/101177 (SH),
+      PR target/111528, PR target/110170 (x86), PR target/111380 (PPC),
+      PR target/111366 (PPC), PR tree-optimization/111622,
+      PR tree-optimization/111694, PR tree-optimization/111519,
+      PR middle-end/111699, PR ada/111434, PR c/111884, PR c++/89038,
+      PR fortran/111837, PR modula2/111756.
+  * Update VCS attributes.
+  * Configure with --disable-s390-excess-float-precision for sid/trixie and
+    Ubuntu noble (24.04 LTS).
+  * Update the gcc-as-needed patch for loong64. Closes: #1054469.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 25 Oct 2023 15:48:10 +0200
+
+gcc-13 (13.2.0-5) unstable; urgency=medium
+
+  * Update to git 20231005 from the gcc-13 branch.
+    - Fix PR tree-optimization/111331, PR tree-optimization/110386,
+      PR target/111121 (AArch64), PR tree-optimization/110315,
+      PR target/111411 (AArch64), PR target/111412 (riscv),
+      PR ada/110488, PR c++/111493, PR c++/111485, PR c++/99631,
+      PR c++/111471, PR fortran/37336, PR fortran/111674, PR fortran/92586,
+      PR fortran/68155, PR modula2/111510, PR libstdc++/111050,
+      PR libstdc++/111102, PR libstdc++/108046, PR libstdc++/111511,
+      PR c++/111512, PR c++/111357.
+  * Provide symlinks for the shared Modula-2 runtime libraries in
+    the private gcc library directory. Closes: #1052008.
+  * Install the static Modula-2 libraries.
+  * Add autopkg test for Modula-2.
+  * Don't assume that hppa64-linux-gnu has the sys/mman.h header,
+    use the fallback for libgcov.
+  * Update the libquadmath portions of the copyright file. Closes: #1052314.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 06 Oct 2023 11:50:52 +0200
+
+gcc-13 (13.2.0-4) unstable; urgency=medium
+
+  * Update to git 20230913 from the gcc-13 branch.
+    - Fix PR target/96762 (PPC), PR target/111340 (x86),
+      PR target/111306 (x86), PR target/111335 (x86),
+      PR modula2/111330.
+    - Address stack protector and stack clash protection weaknesses
+      on AArch64. CVE-2023-4039.
+
+  [ Matthias Klose ]
+  * Fix PR fortran/88552, taken from the trunk. LP: #1842164.
+
+  [ Aurelien Jarno ]
+  * Update libasan8 symbols for riscv64.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 13 Sep 2023 13:17:34 +0200
 
 gcc-13 (13.2.0-3) unstable; urgency=medium
 

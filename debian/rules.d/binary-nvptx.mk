@@ -14,10 +14,12 @@ d_pl_nvptx = debian/$(p_pl_nvptx)
 dirs_nvptx = \
 	$(docdir)/$(p_xbase)/ \
 	$(PF)/bin \
+	$(gcc_lib_dir)/accel \
 	$(gcc_lexec_dir)/accel
 
 files_nvptx = \
 	$(PF)/bin/$(DEB_TARGET_GNU_TYPE)-accel-nvptx-none-gcc$(pkg_ver) \
+	$(gcc_lib_dir)/accel/nvptx-none \
 	$(gcc_lexec_dir)/accel/nvptx-none
 
 # not needed: libs moved, headers not needed for lto1

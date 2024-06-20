@@ -4,7 +4,11 @@ ifneq ($(DEB_STAGE),rtlibs)
     arch_binaries  := $(arch_binaries) gm2-multi
   endif
   endif
-  arch_binaries := $(arch_binaries) gm2
+  arch_binaries := $(arch_binaries) gm2-nat gm2-host
+  ifeq ($(unprefixed_names),yes)
+    arch_binaries := $(arch_binaries) gm2
+    indep_binaries := $(indep_binaries) gm2-build
+  endif
 
   ifeq ($(with_m2dev),yes)
     $(lib_binaries) += libgm2-dev
@@ -58,34 +62,45 @@ ifneq ($(DEB_STAGE),rtlibs)
   endif
 endif
 
-p_gm2           = gm2$(pkg_ver)$(cross_bin_arch)
+p_gm2_n		= gm2$(pkg_ver)-$(subst _,-,$(TARGET_ALIAS))
+p_gm2_h		= gm2$(pkg_ver)-for-host
+p_gm2_b		= gm2$(pkg_ver)-for-build
+p_gm2           = gm2$(pkg_ver)
 p_gm2_m		= gm2$(pkg_ver)-multilib$(cross_bin_arch)
 p_libgm2	= libgm2-$(GM2_SONAME)
 p_libgm2dev	= libgm2$(pkg_ver)-dev
 p_gm2d		= gm2$(pkg_ver)-doc
 
+d_gm2_n		= debian/$(p_gm2_n)
+d_gm2_h		= debian/$(p_gm2_h)
+d_gm2_b		= debian/$(p_gm2_b)
 d_gm2           = debian/$(p_gm2)
 d_gm2_m		= debian/$(p_gm2_m)
 d_libgm2	= debian/$(p_libgm2)
 d_libgm2dev	= debian/$(p_libgm2dev)
 d_gm2d		= debian/$(p_gm2d)
 
-dirs_gm2 = \
+dirs_gm2_n = \
 	$(PF)/bin \
 	$(PF)/share/man/man1 \
 	$(gcc_lexec_dir) \
-	$(gcc_lib_dir)/plugin
+	$(gcc_lib_dir)/plugin \
+	usr/share/lintian/overrides
 #ifneq ($(DEB_CROSS),yes)
-#  dirs_gm2 += \
+#  dirs_gm2_n += \
 #	$(gm2_include_dir)
 #endif
 
-files_gm2 = \
+dirs_gm2 = \
+	$(PF)/bin \
+	$(PF)/share/man/man1
+
+files_gm2_n = \
 	$(PF)/bin/$(cmd_prefix)gm2$(pkg_ver) \
 	$(gcc_lib_dir)/plugin/m2rte.so \
 	$(gcc_lexec_dir)/cc1gm2
 ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
-    files_gm2 += \
+    files_gm2_n += \
 	$(PF)/share/man/man1/$(cmd_prefix)gm2$(pkg_ver).1
 endif
 
@@ -93,6 +108,54 @@ dirs_libgm2 = \
 	$(PF)/lib \
 	$(gm2_include_dir) \
 	$(gcc_lib_dir)
+
+$(binary_stamp)-gm2-nat: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+
+	rm -rf $(d_gm2_n)
+	dh_installdirs -p$(p_gm2_n) $(dirs_gm2_n)
+
+	$(dh_compat2) dh_movefiles -p$(p_gm2_n) $(files_gm2_n)
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
+	$(DWZ) \
+	  $(d_gm2_n)/$(gcc_lexec_dir)/cc1gm2
+endif
+	dh_strip -p$(p_gm2_n) \
+	  $(if $(unstripped_exe),-X/cc1gm2 -X/gm2)
+	dh_shlibdeps -p$(p_gm2_n)
+
+	mkdir -p $(d_gm2_n)/usr/share/lintian/overrides
+	echo '$(p_gm2_n) binary: hardening-no-pie' \
+	  > $(d_gm2_n)/usr/share/lintian/overrides/$(p_gm2_n)
+
+	debian/dh_doclink -p$(p_gm2_n) $(p_xbase)
+
+	echo $(p_gm2_n) >> debian/arch_binaries
+
+	find $(d_gm2_n) -type d -empty -delete
+
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gm2-host: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gm2_h)
+	debian/dh_doclink -p$(p_gm2_h) $(p_xbase)
+	echo $(p_gm2_h) >> debian/arch_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
+
+$(binary_stamp)-gm2-build: $(install_stamp)
+	dh_testdir
+	dh_testroot
+	mv $(install_stamp) $(install_stamp)-tmp
+	rm -rf $(d_gm2_b)
+	debian/dh_doclink -p$(p_gm2_b) $(p_cpp_b)
+	echo $(p_gm2_b) >> debian/indep_binaries
+	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
 
 $(binary_stamp)-gm2: $(install_stamp)
 	dh_testdir
@@ -105,37 +168,17 @@ $(binary_stamp)-gm2: $(install_stamp)
 	dh_installdocs -p$(p_gm2)
 	dh_installchangelogs -p$(p_gm2) src/gcc/m2/ChangeLog
 
-	$(dh_compat2) dh_movefiles -p$(p_gm2) $(files_gm2)
-
-ifeq ($(unprefixed_names),yes)
 	ln -sf $(cmd_prefix)gm2$(pkg_ver) \
 	    $(d_gm2)/$(PF)/bin/gm2$(pkg_ver)
-  ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
-	ln -sf $(cmd_prefix)gm2$(pkg_ver).1 \
-	    $(d_gm2)/$(PF)/share/man/man1/gm2$(pkg_ver).1
-  endif
+ifneq ($(GFDL_INVARIANT_FREE),yes-now-pure-gfdl)
+	ln -sf $(cmd_prefix)gm2$(pkg_ver).1.gz \
+	    $(d_gm2)/$(PF)/share/man/man1/gm2$(pkg_ver).1.gz
 endif
-	dh_installdirs -p$(p_gm2)
 	dh_link -p$(p_gm2) \
 		/$(docdir)/$(p_xbase)/README.Bugs \
 		/$(docdir)/$(p_gm2)/README.Bugs
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTONS)))
-	$(DWZ) \
-	  $(d_gm2)/$(gcc_lexec_dir)/cc1gm2
-endif
-	dh_strip -p$(p_gm2) \
-	  $(if $(unstripped_exe),-X/cc1gm2 -X/gm2)
-	dh_shlibdeps -p$(p_gm2)
-
-	mkdir -p $(d_gm2)/usr/share/lintian/overrides
-	echo '$(p_gm2) binary: hardening-no-pie' \
-	  > $(d_gm2)/usr/share/lintian/overrides/$(p_gm2)
-
 	echo $(p_gm2) >> debian/arch_binaries
-
-	find $(d_gm2) -type d -empty -delete
-
 	trap '' 1 2 3 15; touch $@; mv $(install_stamp)-tmp $(install_stamp)
 
 $(binary_stamp)-gm2-multi: $(install_stamp)
@@ -200,18 +243,12 @@ define __do_libgm2
 endef
 
 # install_gm2_lib(lib,soname,flavour,package,subdir)
-#define install_gm2_lib
-#	mkdir -p debian/$(4)/$(gcc_lib_dir$(3))/$(5)
-#	mv $(d)/$(usr_lib$(3))/$(1)*.a debian/$(4)/$(gcc_lib_dir$(3))/$(5)/.
-#	rm -f $(d)/$(usr_lib$(3))/$(1)*.{la,so}
-#	dh_link -p$(4) \
-#	  /$(usr_lib$(3))/$(1).so.$(2) /$(gcc_lib_dir$(3))/$(5)/$(1).so
-#endef
 define install_gm2_lib
 	dh_link -p$(4) \
-	  /$(usr_lib$(3))/$(1).so.$(2) /$(gcc_lib_dir$(3))/$(5)/$(1).so
-	rm -f $(d)/$(usr_lib$(3))/$(1).so
-	rm -f $(d)/$(usr_lib$(3))/$(1).a
+	  /$(usr_lib$(3))/$(1).so.$(2) /$(gcc_lib_dir$(3))/$(5)/$(1).so \
+	  /$(usr_lib$(3))/$(1).so.$(2) /$(gcc_lib_dir$(3))/$(1).so
+	mv $(d)/$(usr_lib$(3))/$(1)*.a debian/$(4)/$(gcc_lib_dir$(3))
+	rm -f $(d)/$(usr_lib$(3))/$(1)*.{la,so}
 endef
 
 define __do_libgm2_dev
@@ -235,9 +272,6 @@ define __do_libgm2_dev
 	$(call install_gm2_lib,libm2iso,$(GM2_SONAME),$(2),$(p_l),m2/m2iso)
 	$(call install_gm2_lib,libm2log,$(GM2_SONAME),$(2),$(p_l),m2/m2log)
 	$(call install_gm2_lib,libm2min,$(GM2_SONAME),$(2),$(p_l),m2/m2min)
-
-	: # included in gm2 package
-	rm -f $(d_l)/$(gm2_include_dir)/__entrypoint.di
 
 	debian/dh_doclink -p$(p_l) \
 		$(if $(filter yes,$(with_separate_gm2)),$(p_gm2),$(p_lbase))

@@ -17,6 +17,9 @@ Depends: gccgo-13
 Tests: libgomp-link
 Depends: gfortran-13, gcc-13
 
+Tests: libgm2-link
+Depends: gm2-13
+
 Tests: libgnat-link
 Depends: gnat-13
 
