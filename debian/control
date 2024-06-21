@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 9.20141010), dpkg-dev (>= 1.17.14), g++-multilib [a
   gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext, 
   gdb:native [!riscv64 !mipsel !mips64el], nvptx-tools [amd64 ppc64el], amdgcn-tools [amd64], 
   texinfo (>= 4.3), locales-all, sharutils, 
-  procps, gnat-13:native [!arc !ia64 !loong64 !m32r !sh3 !sh3eb !sh4eb], g++-13:native, netbase, gdc-13:native [!arc !ia64 !loong64 !m68k !sh4 !s390 !sparc64 !alpha !hurd-alpha !hurd-amd64 !hurd-i386 !hurd-alpha !kfreebsd-amd64 !kfreebsd-i386 !kfreebsd-alpha], python3:any, 
+  procps, gnat-12:native [!arc !ia64 !loong64 !m32r !sh3 !sh3eb !sh4eb], g++-12:native, netbase, gdc-12:native [!arc !ia64 !loong64 !m68k !sh4 !s390 !sparc64 !alpha !hurd-alpha !hurd-amd64 !hurd-i386 !hurd-alpha !kfreebsd-amd64 !kfreebsd-i386 !kfreebsd-alpha], python3:any,
   libisl-dev (>= 0.20), libmpc-dev (>= 1.0), libmpfr-dev (>= 3.0.0-9~), libgmp-dev (>= 2:5.0.1~), lib32z1-dev [amd64 kfreebsd-amd64], lib64z1-dev [i386], unzip <!nocheck>, 
   dejagnu <!nocheck>, coreutils (>= 2.26) | realpath (>= 1.9.12), chrpath, lsb-release, quilt, time, 
   pkg-config, libgc-dev, 
@@ -1178,78 +1178,78 @@ Description: Runtime library for GNU Go applications (x32)
  Library needed for GNU Go applications linked against the
  shared library.
 
-Package: libstdc++6
-X-DH-Build-For-Type: target
-Architecture: any
-Section: libs
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), ${dep:libc}, ${shlibs:Depends}, ${misc:Depends}
-Provides: libstdc++6-armel [armel], libstdc++6-armhf [armhf]
-Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
-Breaks: ${multiarch:breaks}
-Conflicts: scim (<< 1.4.2-1)
-Replaces: libstdc++6-13-dbg (<< 4.9.0-3)
-Description: GNU Standard C++ Library v3
- This package contains an additional runtime library for C++ programs
- built with the GNU compiler.
- .
- libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
- was included up to g++-2.95. The first version of libstdc++-v3 appeared
- in g++-3.0.
+#Package: libstdc++6
+#X-DH-Build-For-Type: target
+#Architecture: any
+#Section: libs
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), ${dep:libc}, ${shlibs:Depends}, ${misc:Depends}
+#Provides: libstdc++6-armel [armel], libstdc++6-armhf [armhf]
+#Multi-Arch: same
+#Pre-Depends: ${misc:Pre-Depends}
+#Breaks: ${multiarch:breaks}
+#Conflicts: scim (<< 1.4.2-1)
+#Replaces: libstdc++6-13-dbg (<< 4.9.0-3)
+#Description: GNU Standard C++ Library v3
+# This package contains an additional runtime library for C++ programs
+# built with the GNU compiler.
+# .
+# libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
+# was included up to g++-2.95. The first version of libstdc++-v3 appeared
+# in g++-3.0.
 
-Package: lib32stdc++6
-X-DH-Build-For-Type: target
-Architecture: amd64 ppc64 kfreebsd-amd64 s390x sparc64 x32 mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el
-Section: libs
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), lib32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
-Conflicts: ${confl:lib32}
-Description: GNU Standard C++ Library v3 (32 bit Version)
- This package contains an additional runtime library for C++ programs
- built with the GNU compiler.
+#Package: lib32stdc++6
+#X-DH-Build-For-Type: target
+#Architecture: amd64 ppc64 kfreebsd-amd64 s390x sparc64 x32 mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el
+#Section: libs
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), lib32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
+#Conflicts: ${confl:lib32}
+#Description: GNU Standard C++ Library v3 (32 bit Version)
+# This package contains an additional runtime library for C++ programs
+# built with the GNU compiler.
 
-Package: lib64stdc++6
-X-DH-Build-For-Type: target
-Architecture: i386 powerpc sparc s390 mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el x32
-Section: libs
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), lib64gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: GNU Standard C++ Library v3 (64bit)
- This package contains an additional runtime library for C++ programs
- built with the GNU compiler.
- .
- libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
- was included up to g++-2.95. The first version of libstdc++-v3 appeared
- in g++-3.0.
+#Package: lib64stdc++6
+#X-DH-Build-For-Type: target
+#Architecture: i386 powerpc sparc s390 mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el x32
+#Section: libs
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), lib64gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
+#Description: GNU Standard C++ Library v3 (64bit)
+# This package contains an additional runtime library for C++ programs
+# built with the GNU compiler.
+# .
+# libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
+# was included up to g++-2.95. The first version of libstdc++-v3 appeared
+# in g++-3.0.
 
-Package: libn32stdc++6
-X-DH-Build-For-Type: target
-Architecture: mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el
-Section: libs
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), libn32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: GNU Standard C++ Library v3 (n32)
- This package contains an additional runtime library for C++ programs
- built with the GNU compiler.
- .
- libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
- was included up to g++-2.95. The first version of libstdc++-v3 appeared
- in g++-3.0.
+#Package: libn32stdc++6
+#X-DH-Build-For-Type: target
+#Architecture: mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el
+#Section: libs
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), libn32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
+#Description: GNU Standard C++ Library v3 (n32)
+# This package contains an additional runtime library for C++ programs
+# built with the GNU compiler.
+# .
+# libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
+# was included up to g++-2.95. The first version of libstdc++-v3 appeared
+# in g++-3.0.
 
-Package: libx32stdc++6
-X-DH-Build-For-Type: target
-Architecture: amd64 i386
-Section: libs
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), libx32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: GNU Standard C++ Library v3 (x32)
- This package contains an additional runtime library for C++ programs
- built with the GNU compiler.
- .
- libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
- was included up to g++-2.95. The first version of libstdc++-v3 appeared
- in g++-3.0.
+#Package: libx32stdc++6
+#X-DH-Build-For-Type: target
+#Architecture: amd64 i386
+#Section: libs
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), libx32gcc-s1 (>= ${gcc:Version}), ${shlibs:Depends}, ${misc:Depends}
+#Description: GNU Standard C++ Library v3 (x32)
+# This package contains an additional runtime library for C++ programs
+# built with the GNU compiler.
+# .
+# libstdc++-v3 is a complete rewrite from the previous libstdc++-v2, which
+# was included up to g++-2.95. The first version of libstdc++-v3 appeared
+# in g++-3.0.
 
 Package: libstdc++-13-dev
 X-DH-Build-For-Type: target
@@ -1283,26 +1283,26 @@ Description: GNU Standard C++ Library v3 (shared library subset kit)
  .
  Unless you are making one of those, you will not need this package.
 
-Package: libstdc++6-13-dbg
-X-DH-Build-For-Type: target
-Architecture: any
-Section: debug
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), libstdc++6 (>= ${gcc:Version}),
- , ${shlibs:Depends}, ${misc:Depends}
-Provides: libstdc++6-13-dbg-armel [armel], libstdc++6-13-dbg-armhf [armhf]
-Multi-Arch: same
-Recommends: libstdc++-13-dev (= ${gcc:Version})
-Conflicts: libstdc++5-dbg, libstdc++5-3.3-dbg, libstdc++6-dbg,
- libstdc++6-4.0-dbg, libstdc++6-4.1-dbg, libstdc++6-4.2-dbg,
- libstdc++6-4.3-dbg, libstdc++6-4.4-dbg, libstdc++6-4.5-dbg,
- libstdc++6-4.6-dbg, libstdc++6-4.7-dbg, libstdc++6-4.8-dbg,
- libstdc++6-4.9-dbg, libstdc++6-5-dbg, libstdc++6-6-dbg,
- libstdc++6-7-dbg, libstdc++6-8-dbg, libstdc++6-9-dbg,
- libstdc++6-10-dbg, libstdc++6-11-dbg, libstdc++6-12-dbg,
-Description: GNU Standard C++ Library v3 (debug build)
- This package contains a debug build of the shared libstdc++ library.  The debug
- symbols for the default build can be found in the libstdc++6-dbgsym package.
+#Package: libstdc++6-13-dbg
+#X-DH-Build-For-Type: target
+#Architecture: any
+#Section: debug
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), libstdc++6 (>= ${gcc:Version}),
+# , ${shlibs:Depends}, ${misc:Depends}
+#Provides: libstdc++6-13-dbg-armel [armel], libstdc++6-13-dbg-armhf [armhf]
+#Multi-Arch: same
+#Recommends: libstdc++-13-dev (= ${gcc:Version})
+#Conflicts: libstdc++5-dbg, libstdc++5-3.3-dbg, libstdc++6-dbg,
+# libstdc++6-4.0-dbg, libstdc++6-4.1-dbg, libstdc++6-4.2-dbg,
+# libstdc++6-4.3-dbg, libstdc++6-4.4-dbg, libstdc++6-4.5-dbg,
+# libstdc++6-4.6-dbg, libstdc++6-4.7-dbg, libstdc++6-4.8-dbg,
+# libstdc++6-4.9-dbg, libstdc++6-5-dbg, libstdc++6-6-dbg,
+# libstdc++6-7-dbg, libstdc++6-8-dbg, libstdc++6-9-dbg,
+# libstdc++6-10-dbg, libstdc++6-11-dbg, libstdc++6-12-dbg,
+#Description: GNU Standard C++ Library v3 (debug build)
+# This package contains a debug build of the shared libstdc++ library.  The debug
+# symbols for the default build can be found in the libstdc++6-dbgsym package.
 
 Package: lib32stdc++-13-dev
 X-DH-Build-For-Type: target
@@ -1319,24 +1319,24 @@ Description: GNU Standard C++ Library v3 (development files)
  was included up to g++-2.95. The first version of libstdc++-v3 appeared
  in g++-3.0.
 
-Package: lib32stdc++6-13-dbg
-X-DH-Build-For-Type: target
-Architecture: amd64 ppc64 kfreebsd-amd64 s390x sparc64 x32 mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el
-Section: debug
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), lib32stdc++6 (>= ${gcc:Version}),
- libstdc++-13-dev (= ${gcc:Version}), ,
- ${shlibs:Depends}, ${misc:Depends}
-Conflicts: lib32stdc++6-dbg, lib32stdc++6-4.0-dbg,
- lib32stdc++6-4.1-dbg, lib32stdc++6-4.2-dbg, lib32stdc++6-4.3-dbg,
- lib32stdc++6-4.4-dbg, lib32stdc++6-4.5-dbg, lib32stdc++6-4.6-dbg,
- lib32stdc++6-4.7-dbg, lib32stdc++6-4.8-dbg, lib32stdc++6-4.9-dbg,
- lib32stdc++6-5-dbg, lib32stdc++6-6-dbg, lib32stdc++6-7-dbg,
- lib32stdc++6-8-dbg, lib32stdc++6-9-dbg, lib32stdc++6-10-dbg,
- lib32stdc++6-11-dbg, lib32stdc++6-12-dbg,
-Description: GNU Standard C++ Library v3 (debug build)
- This package contains a debug build of the shared libstdc++ library.  The debug
- symbols for the default build can be found in the libstdc++6-dbgsym package.
+#Package: lib32stdc++6-13-dbg
+#X-DH-Build-For-Type: target
+#Architecture: amd64 ppc64 kfreebsd-amd64 s390x sparc64 x32 mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el
+#Section: debug
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), lib32stdc++6 (>= ${gcc:Version}),
+# libstdc++-13-dev (= ${gcc:Version}), ,
+# ${shlibs:Depends}, ${misc:Depends}
+#Conflicts: lib32stdc++6-dbg, lib32stdc++6-4.0-dbg,
+# lib32stdc++6-4.1-dbg, lib32stdc++6-4.2-dbg, lib32stdc++6-4.3-dbg,
+# lib32stdc++6-4.4-dbg, lib32stdc++6-4.5-dbg, lib32stdc++6-4.6-dbg,
+# lib32stdc++6-4.7-dbg, lib32stdc++6-4.8-dbg, lib32stdc++6-4.9-dbg,
+# lib32stdc++6-5-dbg, lib32stdc++6-6-dbg, lib32stdc++6-7-dbg,
+# lib32stdc++6-8-dbg, lib32stdc++6-9-dbg, lib32stdc++6-10-dbg,
+# lib32stdc++6-11-dbg, lib32stdc++6-12-dbg,
+#Description: GNU Standard C++ Library v3 (debug build)
+# This package contains a debug build of the shared libstdc++ library.  The debug
+# symbols for the default build can be found in the libstdc++6-dbgsym package.
 
 Package: lib64stdc++-13-dev
 X-DH-Build-For-Type: target
@@ -1353,24 +1353,24 @@ Description: GNU Standard C++ Library v3 (development files)
  was included up to g++-2.95. The first version of libstdc++-v3 appeared
  in g++-3.0.
 
-Package: lib64stdc++6-13-dbg
-X-DH-Build-For-Type: target
-Architecture: i386 powerpc sparc s390 mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el x32
-Section: debug
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), lib64stdc++6 (>= ${gcc:Version}),
- libstdc++-13-dev (= ${gcc:Version}), ,
- ${shlibs:Depends}, ${misc:Depends}
-Conflicts: lib64stdc++6-dbg, lib64stdc++6-4.0-dbg,
- lib64stdc++6-4.1-dbg, lib64stdc++6-4.2-dbg, lib64stdc++6-4.3-dbg,
- lib64stdc++6-4.4-dbg, lib64stdc++6-4.5-dbg, lib64stdc++6-4.6-dbg,
- lib64stdc++6-4.7-dbg, lib64stdc++6-4.8-dbg, lib64stdc++6-4.9-dbg,
- lib64stdc++6-5-dbg, lib64stdc++6-6-dbg, lib64stdc++6-7-dbg,
- lib64stdc++6-8-dbg, lib64stdc++6-9-dbg, lib64stdc++6-10-dbg,
- lib64stdc++6-11-dbg, lib64stdc++6-12-dbg,
-Description: GNU Standard C++ Library v3 (debug build)
- This package contains a debug build of the shared libstdc++ library.  The debug
- symbols for the default build can be found in the libstdc++6-dbgsym package.
+#Package: lib64stdc++6-13-dbg
+#X-DH-Build-For-Type: target
+#Architecture: i386 powerpc sparc s390 mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el x32
+#Section: debug
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), lib64stdc++6 (>= ${gcc:Version}),
+# libstdc++-13-dev (= ${gcc:Version}), ,
+# ${shlibs:Depends}, ${misc:Depends}
+#Conflicts: lib64stdc++6-dbg, lib64stdc++6-4.0-dbg,
+# lib64stdc++6-4.1-dbg, lib64stdc++6-4.2-dbg, lib64stdc++6-4.3-dbg,
+# lib64stdc++6-4.4-dbg, lib64stdc++6-4.5-dbg, lib64stdc++6-4.6-dbg,
+# lib64stdc++6-4.7-dbg, lib64stdc++6-4.8-dbg, lib64stdc++6-4.9-dbg,
+# lib64stdc++6-5-dbg, lib64stdc++6-6-dbg, lib64stdc++6-7-dbg,
+# lib64stdc++6-8-dbg, lib64stdc++6-9-dbg, lib64stdc++6-10-dbg,
+# lib64stdc++6-11-dbg, lib64stdc++6-12-dbg,
+#Description: GNU Standard C++ Library v3 (debug build)
+# This package contains a debug build of the shared libstdc++ library.  The debug
+# symbols for the default build can be found in the libstdc++6-dbgsym package.
 
 Package: libn32stdc++-13-dev
 X-DH-Build-For-Type: target
@@ -1387,24 +1387,24 @@ Description: GNU Standard C++ Library v3 (development files)
  was included up to g++-2.95. The first version of libstdc++-v3 appeared
  in g++-3.0.
 
-Package: libn32stdc++6-13-dbg
-X-DH-Build-For-Type: target
-Architecture: mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el
-Section: debug
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), libn32stdc++6 (>= ${gcc:Version}),
- libstdc++-13-dev (= ${gcc:Version}), ,
- ${shlibs:Depends}, ${misc:Depends}
-Conflicts: libn32stdc++6-dbg, libn32stdc++6-4.0-dbg,
- libn32stdc++6-4.1-dbg, libn32stdc++6-4.2-dbg, libn32stdc++6-4.3-dbg,
- libn32stdc++6-4.4-dbg, libn32stdc++6-4.5-dbg, libn32stdc++6-4.6-dbg,
- libn32stdc++6-4.7-dbg, libn32stdc++6-4.8-dbg, libn32stdc++6-4.9-dbg,
- libn32stdc++6-5-dbg, libn32stdc++6-6-dbg, libn32stdc++6-7-dbg,
- libn32stdc++6-8-dbg, libn32stdc++6-9-dbg, libn32stdc++6-10-dbg,
- libn32stdc++6-11-dbg, libn32stdc++6-12-dbg,
-Description: GNU Standard C++ Library v3 (debug build)
- This package contains a debug build of the shared libstdc++ library.  The debug
- symbols for the default build can be found in the libstdc++6-dbgsym package.
+#Package: libn32stdc++6-13-dbg
+#X-DH-Build-For-Type: target
+#Architecture: mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el
+#Section: debug
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), libn32stdc++6 (>= ${gcc:Version}),
+# libstdc++-13-dev (= ${gcc:Version}), ,
+# ${shlibs:Depends}, ${misc:Depends}
+#Conflicts: libn32stdc++6-dbg, libn32stdc++6-4.0-dbg,
+# libn32stdc++6-4.1-dbg, libn32stdc++6-4.2-dbg, libn32stdc++6-4.3-dbg,
+# libn32stdc++6-4.4-dbg, libn32stdc++6-4.5-dbg, libn32stdc++6-4.6-dbg,
+# libn32stdc++6-4.7-dbg, libn32stdc++6-4.8-dbg, libn32stdc++6-4.9-dbg,
+# libn32stdc++6-5-dbg, libn32stdc++6-6-dbg, libn32stdc++6-7-dbg,
+# libn32stdc++6-8-dbg, libn32stdc++6-9-dbg, libn32stdc++6-10-dbg,
+# libn32stdc++6-11-dbg, libn32stdc++6-12-dbg,
+#Description: GNU Standard C++ Library v3 (debug build)
+# This package contains a debug build of the shared libstdc++ library.  The debug
+# symbols for the default build can be found in the libstdc++6-dbgsym package.
 
 Package: libx32stdc++-13-dev
 X-DH-Build-For-Type: target
@@ -1421,22 +1421,22 @@ Description: GNU Standard C++ Library v3 (development files)
  was included up to g++-2.95. The first version of libstdc++-v3 appeared
  in g++-3.0.
 
-Package: libx32stdc++6-13-dbg
-X-DH-Build-For-Type: target
-Architecture: amd64 i386
-Section: debug
-Priority: optional
-Depends: gcc-13-base (= ${gcc:Version}), libx32stdc++6 (>= ${gcc:Version}),
- libstdc++-13-dev (= ${gcc:Version}), ,
- ${shlibs:Depends}, ${misc:Depends}
-Conflicts: libx32stdc++6-dbg, libx32stdc++6-4.6-dbg,
- libx32stdc++6-4.7-dbg, libx32stdc++6-4.8-dbg, libx32stdc++6-4.9-dbg,
- libx32stdc++6-5-dbg, libx32stdc++6-6-dbg, libx32stdc++6-7-dbg,
- libx32stdc++6-8-dbg, libx32stdc++6-9-dbg, libx32stdc++6-10-dbg,
- libx32stdc++6-11-dbg, libx32stdc++6-12-dbg,
-Description: GNU Standard C++ Library v3 (debug build)
- This package contains a debug build of the shared libstdc++ library.  The debug
- symbols for the default build can be found in the libstdc++6-dbgsym package.
+#Package: libx32stdc++6-13-dbg
+#X-DH-Build-For-Type: target
+#Architecture: amd64 i386
+#Section: debug
+#Priority: optional
+#Depends: gcc-13-base (= ${gcc:Version}), libx32stdc++6 (>= ${gcc:Version}),
+# libstdc++-13-dev (= ${gcc:Version}), ,
+# ${shlibs:Depends}, ${misc:Depends}
+#Conflicts: libx32stdc++6-dbg, libx32stdc++6-4.6-dbg,
+# libx32stdc++6-4.7-dbg, libx32stdc++6-4.8-dbg, libx32stdc++6-4.9-dbg,
+# libx32stdc++6-5-dbg, libx32stdc++6-6-dbg, libx32stdc++6-7-dbg,
+# libx32stdc++6-8-dbg, libx32stdc++6-9-dbg, libx32stdc++6-10-dbg,
+# libx32stdc++6-11-dbg, libx32stdc++6-12-dbg,
+#Description: GNU Standard C++ Library v3 (debug build)
+# This package contains a debug build of the shared libstdc++ library.  The debug
+# symbols for the default build can be found in the libstdc++6-dbgsym package.
 
 Package: libstdc++-13-doc
 Architecture: all
