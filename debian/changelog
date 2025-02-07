@@ -1,3 +1,9 @@
+gcc-13 (13.2.0-3deepin4) unstable; urgency=medium
+
+  * move libgcc_s.so.1 to /usr for DEP17
+
+ -- Tianyu Chen <sweetyfish@deepin.org>  Fri, 07 Feb 2025 09:38:19 +0100
+
 gcc-13 (13.2.0-3deepin3) unstable; urgency=medium
 
   * Enable loong64 as a cross architecture.
